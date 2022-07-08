@@ -15,30 +15,33 @@ import java.util.Date;
 @Data
 public class DownloadConfiguration {
 
+    /**
+     * 配置源类型
+     */
     public static enum SourceType {
         /**
-         * a search key, such as 3977
+         * 从url中读取配置
          */
         URL,
         /**
-         * json file
+         * json file 从json文件中读取配置
          */
         DriveListFile,
     }
 
     /**
-     * 下载源
+     * 配置源类型
      */
     private SourceType sourceType;
+
+    /**
+     * 配置源类型 {@link #sourceType}是{@link SourceType#URL}时配置
+     */
+    private String driverListNewUrlPathBase;
     /**
      * 下载目录跟目录
      */
     private String targetBaseFolder;
-    /**
-     * 工作线程数
-     */
-    private int workThreadsCount;
-
     /**
      * 驱动列表文件目录名称
      */
@@ -53,9 +56,8 @@ public class DownloadConfiguration {
      */
     @Getter(AccessLevel.NONE)
     private boolean useDateAsSubFolder;
-
     /**
-     * 下载日期
+     * 是否使用日期作为下载目录的子目录
      *
      * @see #useDateAsSubFolder
      */
@@ -68,28 +70,41 @@ public class DownloadConfiguration {
     private String saveDatePattern = "yyyyMMddHHmmss";
 
     /**
-     * url参数 searchKey
+     * url参数 searchKey  例如 3977
      *
      * @see #sourceType
+     * @see SourceType#URL
      */
     private String parameterSearchKey;
     /**
-     * url参数 sysid
+     * url参数 sysid  例如 42
      *
      * @see #sourceType
+     * @see SourceType#URL
      */
     private String parameterSysId;
     /**
-     * 源驱动列表文件路径
+     * 驱动列表文件路径 {@link #sourceType}是{@link SourceType#DriveListFile}时配置
      *
      * @see #sourceType
+     * @see SourceType#DriveListFile
      */
     private String sourceDriveListFilePath;
+
+    /**
+     * 工作线程数
+     */
+    private int workThreadsCount;
 
     public boolean getUseDateAsSubFolder() {
         return useDateAsSubFolder;
     }
 
+    /**
+     * 获取驱动列表文件目录
+     *
+     * @return
+     */
     public String getDriveListFileFolderName() {
         String saveDateStr = getSaveDateString();
         if (null == saveDateStr) {
@@ -99,6 +114,11 @@ public class DownloadConfiguration {
         }
     }
 
+    /**
+     * 获取驱动列表文件目录
+     *
+     * @return
+     */
     public String getRealDrivesFolderName() {
         String saveDateStr = getSaveDateString();
         if (null == saveDateStr) {
@@ -108,6 +128,12 @@ public class DownloadConfiguration {
         }
     }
 
+    /**
+     * 获取目录保持时间字符串形式。在{@link #saveDatePattern}有效时可用。
+     *
+     * @return
+     * @throws IllegalArgumentException
+     */
     private String getSaveDateString() throws IllegalArgumentException {
         if (useDateAsSubFolder) {
             if (null == downloadDate) {

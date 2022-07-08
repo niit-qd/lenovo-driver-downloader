@@ -24,7 +24,6 @@ import java.util.List;
  */
 public class DriveDownloadTask {
 
-    private static final String DRIVE_LIST_NEW_URL_PATH_BASE = "https://newsupport.lenovo.com.cn/api/drive/drive_listnew";
     private static final String DRIVE_LIST_NEW_URL_PARAMETER_KEY_SEARCHKEY = "searchKey";
     private static final String DRIVE_LIST_NEW_URL_PARAMETER_KEY_SYSID = "sysid";
 
@@ -78,7 +77,7 @@ public class DriveDownloadTask {
             if (StringUtils.isNotBlank(sysId)) {
                 logger.warn("searchKey = {}", searchKey);
             }
-            String driveListFileUrl = DRIVE_LIST_NEW_URL_PATH_BASE;
+            String driveListFileUrl = downloadConfiguration.getDriverListNewUrlPathBase();
             driveListFileUrl = MyUrlUtils.addParameterPariToUrl(driveListFileUrl, DRIVE_LIST_NEW_URL_PARAMETER_KEY_SEARCHKEY, searchKey);
             driveListFileUrl = MyUrlUtils.addParameterPariToUrl(driveListFileUrl, DRIVE_LIST_NEW_URL_PARAMETER_KEY_SEARCHKEY, searchKey);
             File driveListFileSaveFolder = new File(downloadConfiguration.getTargetBaseFolder(), downloadConfiguration.getRealDrivesFolderName());
