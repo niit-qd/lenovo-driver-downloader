@@ -1,0 +1,16 @@
+com:
+  example:
+    lenovo:
+      driver:
+        downloader:
+          download-configuration:
+            source-type: URL
+            target-base-folder: target/drives
+            work-threads-count: 10
+            drive-list-file-folder-name: driveListFile
+            drives-folder-name: drives
+            use-date-as-sub-folder: false
+            save-date-pattern: yyyyMMddHHmmss
+            parameter-search-key: 12357
+            parameterSysId: 42
+            source-drive-list-file-path: xxx
