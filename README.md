@@ -1,5 +1,7 @@
 # lenovo-driver-downloader
 
+用途，快速省心下载Lenovo&ThinkPad驱动。
+
 ### 配置文件简述
 ```yaml
 # application.yml
