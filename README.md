@@ -14,7 +14,7 @@ com:
             # 配置源类型：URL（需要配置driver-list-new-url-path-base）、DriveListFile
             source-type: URL
             # 驱动列表下载的基础url 适配：source-type: URL
-            # driver-list-new-url-path-base: https://newsupport.lenovo.com.cn/api/drive/drive_listnew
+            driver-list-new-url-path-base: https://newsupport.lenovo.com.cn/api/drive/drive_listnew
             # 驱动存放目录 适配：source-type: URL
             target-base-folder: target/drives
             # 驱动列表文件路径 适配：source-type: DriveListFile
