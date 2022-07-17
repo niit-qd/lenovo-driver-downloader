@@ -32,25 +32,25 @@ com:
 ```
 
 ### url参数的获取
-url的参数是从官方驱动网站的请求中获取的，需要自行查找。
-- Lenovo的驱动和软件下载
-  - 页面地址
-    [选择产品获取支持](https://newsupport.lenovo.com.cn/notebook.html)
-    [选择产品获取支持](https://newsupport.lenovo.com.cn/notebook.html)
-    [查找驱动程序及工具软件](https://newsupport.lenovo.com.cn/driveDownloads_index.html)
-    [驱动和软件下载 小新 15 2022 (Intel平台:IAL7版)](https://newsupport.lenovo.com.cn/driveList.html?fromsource=driveList&selname=%E5%B0%8F%E6%96%B0%2015%202022%20(Intel%E5%B9%B3%E5%8F%B0:IAL7%E7%89%88))
-  - 参数搜索地址
-    https://newsupport.lenovo.com.cn/api/drive/drive_listnew?searchKey=15159&sysid=248
+url的参数是从官方驱动网站的请求中获取的，需要自行查找。<br>
+- Lenovo的驱动和软件下载<br>
+  - 页面地址<br>
+    [选择产品获取支持](https://newsupport.lenovo.com.cn/notebook.html)<br>
+    [选择产品获取支持](https://newsupport.lenovo.com.cn/notebook.html)<br>
+    [查找驱动程序及工具软件](https://newsupport.lenovo.com.cn/driveDownloads_index.html)<br>
+    [驱动和软件下载 小新 15 2022 (Intel平台:IAL7版)](https://newsupport.lenovo.com.cn/driveList.html?fromsource=driveList&selname=%E5%B0%8F%E6%96%B0%2015%202022%20(Intel%E5%B9%B3%E5%8F%B0:IAL7%E7%89%88))<br>
+  - 参数搜索地址<br>
+    https://newsupport.lenovo.com.cn/api/drive/drive_listnew?searchKey=15159&sysid=248<br>
     从上面url中获取产品key`searchKey`和系统id`sysid`。`sysid`不存在时表示默认。
     此url，也可用于`ThinkPad`产品驱动的查询。所以本项目使用了该地址进行查询。
-- ThinkPad的驱动和软件下载
+- ThinkPad的驱动和软件下载<br>
   从返回的数据结构上来看，这个结构更容易理解。
   笔者比较懒，使用联想的驱动JSON结构完成解析之后，不想再花时间处理了。如果你有时间，可以参考联想的结构自行实现吧。 ^_^
-  - 页面地址
-    [请选择您的产品获取支持](https://newthink.lenovo.com.cn/)
-    [ThinkPad笔记本](https://newthink.lenovo.com.cn/product.html#series=ThinkPad%E7%AC%94%E8%AE%B0%E6%9C%AC)
-    [ThinkPad X13 Gen3 AMD](https://newthink.lenovo.com.cn/driveList.html?selname=ThinkPad%20X13%20Gen3%20AMD)
-  - 参数搜索地址
-    https://newthink.lenovo.com.cn/api/ThinkHome/Machine/DriveListInfo?search_key=15272&system_id=248
+  - 页面地址<br>
+    [请选择您的产品获取支持](https://newthink.lenovo.com.cn/)<br>
+    [ThinkPad笔记本](https://newthink.lenovo.com.cn/product.html#series=ThinkPad%E7%AC%94%E8%AE%B0%E6%9C%AC)<br>
+    [ThinkPad X13 Gen3 AMD](https://newthink.lenovo.com.cn/driveList.html?selname=ThinkPad%20X13%20Gen3%20AMD)<br>
+  - 参数搜索地址<br>
+    https://newthink.lenovo.com.cn/api/ThinkHome/Machine/DriveListInfo?search_key=15272&system_id=248<br>
     从上面url中获取产品key`search_key`和系统id`system_id`。`system_id`不存在时表示默认。
     此url，不可用于`Lenovo`产品驱动的查询。
