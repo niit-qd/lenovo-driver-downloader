@@ -2,6 +2,7 @@ package org.example.lenovo.driver.downloader.Task;
 
 import com.alibaba.fastjson.JSON;
 import com.my.downloader.utils.DownloadUtils;
+import com.my.downloader.utils.MyFileUtils;
 import com.my.downloader.utils.MyUrlUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -81,6 +82,7 @@ public class DriveDownloadTask {
             driveListFileUrl = MyUrlUtils.addParameterPariToUrl(driveListFileUrl, DRIVE_LIST_NEW_URL_PARAMETER_KEY_SEARCHKEY, searchKey);
             driveListFileUrl = MyUrlUtils.addParameterPariToUrl(driveListFileUrl, DRIVE_LIST_NEW_URL_PARAMETER_KEY_SEARCHKEY, searchKey);
             File driveListFileSaveFolder = new File(downloadConfiguration.getTargetBaseFolder(), downloadConfiguration.getRealDrivesFolderName());
+            driveListFileSaveFolder = new File(MyFileUtils.fixIllegalCharactersInFilePathName(driveListFileSaveFolder.getPath()));
             try {
                 driveListFile = DownloadUtils.download(driveListFileUrl, driveListFileSaveFolder);
             } catch (IOException | URISyntaxException e) {
@@ -152,12 +154,12 @@ public class DriveDownloadTask {
         } catch (Exception e) {
             logger.warn("cannot get the product host name, so use the default folder. ignore the exception below:", e);
         }
-        try {
-            String nodeCode = data.getDriverMTList().get(0).getNodeCode();
-            drivesFolder = new File(drivesFolder, nodeCode);
-        } catch (Exception e) {
-            logger.warn("cannot get the product type, so use the default folder. ignore the exception below:", e);
-        }
+//        try {
+//            String nodeCode = data.getDriverMTList().get(0).getNodeCode();
+//            drivesFolder = new File(drivesFolder, nodeCode);
+//        } catch (Exception e) {
+//            logger.warn("cannot get the product type, so use the default folder. ignore the exception below:", e);
+//        }
         try {
             String osName = data.getDefaultOSes().get(0).getNAME();
             drivesFolder = new File(drivesFolder, osName);
@@ -196,6 +198,7 @@ public class DriveDownloadTask {
                 driverName = driverName.replace("/", "_");
                 driverName = StringEscapeUtils.unescapeJava(driverName);
                 File driveFolder = new File(drivePartFolder, driverName);
+                driveFolder = new File(MyFileUtils.fixIllegalCharactersInFilePathName(driveFolder.getPath()));
                 if (!driveFolder.isDirectory()) {
                     driveFolder.mkdirs();
                 }

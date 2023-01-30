@@ -61,6 +61,71 @@ public class MyFileUtils {
         return sb.toString();
     }
 
+    /**
+     * 替换文件路径子段上的非法字符：\/:*?"<>|。替换符是单个的空字符串" "。
+     *
+     * @param filePath
+     * @return
+     */
+    public static String fixIllegalCharactersInFilePathName(String filePath) {
+        return fixIllegalCharactersInFilePathName(filePath, " ");
+    }
+
+    /**
+     * 替换文件路径子段上的非法字符：\/:*?"<>|
+     *
+     * @param filePath
+     * @param illegalCharacterReplacement 如果是null，则使用空字符""代替。
+     * @return
+     */
+    public static String fixIllegalCharactersInFilePathName(String filePath, String illegalCharacterReplacement) {
+        if (null == filePath) {
+            return null;
+        }
+        filePath = filePath.trim();
+        String splitRegex = File.separator;
+        // Windows下的“\”在regex表达式中需要转义为“\\”，即"\\\\"。
+        if ("\\".equals(File.separator)) {
+            splitRegex = "\\\\";
+        }
+        String[] filePathSegments = filePath.split(splitRegex);
+        StringBuilder sb = new StringBuilder();
+
+        // 如果是绝对路径的第一段，先追加盘符。
+        int startIndex = 0;
+        if (filePathSegments.length > 0) {
+            String seg0 = filePathSegments[0];
+            // 1. Windows系统路径。根，例如：C:/
+            if (seg0.contains(":") && seg0.indexOf(":") == seg0.lastIndexOf(":")) {
+                int indexOfColon = seg0.indexOf(":");
+                sb.append(seg0.substring(0, indexOfColon)).append(File.separator);
+                // 后面的部分要重新追加
+                filePathSegments[0] = seg0.substring(indexOfColon + 1);
+                startIndex = 0;
+            }
+            // 2. Linux 路径。根：/
+            else if ("".equals(seg0)) {
+                sb.append(File.separator);
+                startIndex = 1;
+            }
+        }
+
+        // 替换
+        if (null == illegalCharacterReplacement) {
+            illegalCharacterReplacement = "";
+        }
+        for (int i = startIndex; i < filePathSegments.length; i++) {
+            String seg = filePathSegments[i];
+            seg = seg.replaceAll("[/:*?\"<>|]+", illegalCharacterReplacement); // 非法字符：\/:*?"<>|，又要上面已经使用/进行split，所以，可以忽略/。
+            sb.append(seg);
+            if (i < filePathSegments.length - 1) {
+                sb.append(File.separator);
+            }
+        }
+
+        return sb.toString();
+    }
+
     public static void main(String[] args) {
         File f1 = new File("C:/a/b/c");
         File f2 = new File("C:/a/d/m");
