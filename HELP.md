@@ -65,4 +65,18 @@ For further reference, please consider the following sections:
    [7.2.1. Accessing Command Line Properties](https://docs.spring.io/spring-boot/docs/2.6.6/reference/htmlsingle/#features.external-config.command-line-args)
    > By default, `SpringApplication` converts any command line option arguments (that is, arguments starting with `--`, such as `--server.port=9000`) to a property and adds them to the Spring Environment. As mentioned previously, command line properties always take precedence over file-based property sources.
    > If you do not want command line properties to be added to the `Environment`, you can disable them by using `SpringApplication.setAddCommandLineProperties(false)`.
-
+4. Windows的Terminal下中文乱码
+   在Windows下，执行`mvn clean spring-boot:run`或`java -jar xxx.jar`的时候，遇到中文会出现乱码。
+   可以使用`chcp`指令修正。
+   ```shell
+   PS C:\Users\admin> chcp
+   活动代码页: 936
+   PS C:\Users\admin> chcp 65001
+   Active code page: 65001
+   PS C:\Users\admin> chcp 936
+   活动代码页: 936
+   ```
+   默认是`936`，在Windows下的终端或者命令提示符下运行之前，现改为65001。
+   [Windows 修改控制台编码为 UTF-8_](https://mxy.cool/2021052715441/)
+   [chcp](https://learn.microsoft.com/zh-cn/windows-server/administration/windows-commands/chcp)
+   [CHCP](https://ss64.com/nt/chcp.html)
