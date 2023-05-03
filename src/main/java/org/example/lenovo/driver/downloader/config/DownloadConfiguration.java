@@ -18,7 +18,7 @@ public class DownloadConfiguration {
     /**
      * 配置源类型
      */
-    public static enum SourceType {
+    public enum SourceType {
         /**
          * 从url中读取配置
          */
@@ -129,7 +129,7 @@ public class DownloadConfiguration {
     }
 
     /**
-     * 获取目录保持时间字符串形式。在{@link #saveDatePattern}有效时可用。
+     * 获取目录保存时间字符串形式。在{@link #saveDatePattern}有效时可用。
      *
      * @return
      * @throws IllegalArgumentException

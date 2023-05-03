@@ -98,7 +98,7 @@ public class MyFileUtils {
             // 1. Windows系统路径。根，例如：C:/
             if (seg0.contains(":") && seg0.indexOf(":") == seg0.lastIndexOf(":")) {
                 int indexOfColon = seg0.indexOf(":");
-                sb.append(seg0.substring(0, indexOfColon)).append(File.separator);
+                sb.append(seg0, 0, indexOfColon).append(File.separator);
                 // 后面的部分要重新追加
                 filePathSegments[0] = seg0.substring(indexOfColon + 1);
                 startIndex = 0;

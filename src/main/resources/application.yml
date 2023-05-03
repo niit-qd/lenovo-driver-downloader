@@ -11,7 +11,7 @@ com:
             # 驱动存放目录 适配：source-type: URL
             target-base-folder: target/drives
             # 驱动列表文件路径 适配：source-type: DriveListFile
-            # source-drive-list-file-path: target/drives/20220708224501/drives/drive_listnew
+            # source-drive-list-file-path: ../drivers/drive_listnew
             drives-folder-name: drives
             # 是否使用日期作为下载目录的子目录 适配：save-date-pattern
             use-date-as-sub-folder: true

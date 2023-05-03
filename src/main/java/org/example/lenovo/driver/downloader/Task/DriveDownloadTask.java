@@ -8,7 +8,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.example.lenovo.driver.downloader.config.DownloadConfiguration;
-import org.example.lenovo.driver.downloader.model.DriveListResult;
+import org.example.lenovo.driver.downloader.model.DriverListResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
@@ -21,36 +21,63 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * @author
+ * @author hw
  */
 public class DriveDownloadTask {
 
-    private static final String DRIVE_LIST_NEW_URL_PARAMETER_KEY_SEARCHKEY = "searchKey";
-    private static final String DRIVE_LIST_NEW_URL_PARAMETER_KEY_SYSID = "sysid";
+    private static final String DRIVE_LIST_NEW_URL_PARAMETER_KEY_SEARCH_KEY = "searchKey";
+    private static final String DRIVE_LIST_NEW_URL_PARAMETER_KEY_SYS_ID = "sysid";
 
     private static final Logger logger = LoggerFactory.getLogger(DriveDownloadTask.class);
 
 
     public static void downloadDriveList(DownloadConfiguration downloadConfiguration) {
-
-
-        //
-        DriveListResult driveListResult = parseDriveListFromFile(downloadConfiguration, true);
-        if (null == driveListResult) {
-            logger.warn("driveListResult = null");
+        // get or download the driver list file
+        File driveListResultFile = obtainDriveListFile(downloadConfiguration);
+        if (null == driveListResultFile) {
+            logger.warn("driveListResultFile = null");
             return;
         }
 
-        //
+        // parse driver list file
+        DriverListResult driverListResult = parseDriveListFromFile(driveListResultFile);
+
+        // copy(save) driver list file
+        File driverListFolder = getDriverListFolder(downloadConfiguration, driverListResult);
+        if (null != driverListFolder &&
+                !StringUtils.equals(driveListResultFile.getParentFile().getAbsolutePath(), driverListFolder.getAbsolutePath())) {
+            try {
+                FileUtils.copyFileToDirectory(driveListResultFile, driverListFolder);
+            } catch (IOException e) {
+                logger.error("failed copy drive list file. catch exception:", e);
+            }
+        }
+
+        // download drivers
         try {
-            downloadDriveListByDriveListResult(downloadConfiguration, driveListResult);
+            downloadDriveListByDriveListResult(downloadConfiguration, driverListResult);
         } catch (Exception e) {
             logger.error("", e);
         }
 
     }
 
-    private static DriveListResult parseDriveListFromFile(DownloadConfiguration downloadConfiguration, boolean copyDriveListFileToTarget) {
+    private static DriverListResult parseDriveListFromFile(File driveListResultFile) {
+        if (null == driveListResultFile || !driveListResultFile.isFile()) {
+            return null;
+        }
+
+        String driveListJSONString;
+        try {
+            driveListJSONString = FileUtils.readFileToString(driveListResultFile, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            logger.error("read {} failed. catch exception:", driveListResultFile, e);
+            return null;
+        }
+        return JSON.parseObject(driveListJSONString, DriverListResult.class);
+    }
+
+    private static File obtainDriveListFile(DownloadConfiguration downloadConfiguration) {
 
         if (null == downloadConfiguration) {
             logger.warn("downloadConfiguration = null");
@@ -59,7 +86,7 @@ public class DriveDownloadTask {
 
         DownloadConfiguration.SourceType sourceType = downloadConfiguration.getSourceType();
         if (null == sourceType) {
-            logger.warn("sourceType == {}", sourceType);
+            logger.warn("sourceType == null");
             return null;
         }
 
@@ -68,66 +95,99 @@ public class DriveDownloadTask {
         }
 
         File driveListFile = null;
-        if (sourceType == DownloadConfiguration.SourceType.URL) {
+        if (sourceType == DownloadConfiguration.SourceType.DriveListFile) {
+            driveListFile = new File(downloadConfiguration.getSourceDriveListFilePath());
+        } else if (sourceType == DownloadConfiguration.SourceType.URL) {
+            String driveListFileUrl = downloadConfiguration.getDriverListNewUrlPathBase();
             String searchKey = downloadConfiguration.getParameterSearchKey();
             String sysId = downloadConfiguration.getParameterSysId();
             if (StringUtils.isBlank(searchKey)) {
                 logger.warn("searchKey = {}", searchKey);
                 return null;
+            } else {
+                driveListFileUrl = MyUrlUtils.addParameterPariToUrl(driveListFileUrl, DRIVE_LIST_NEW_URL_PARAMETER_KEY_SEARCH_KEY, searchKey);
             }
             if (StringUtils.isNotBlank(sysId)) {
                 logger.warn("searchKey = {}", searchKey);
+            } else {
+                driveListFileUrl = MyUrlUtils.addParameterPariToUrl(sysId, DRIVE_LIST_NEW_URL_PARAMETER_KEY_SYS_ID, searchKey);
             }
-            String driveListFileUrl = downloadConfiguration.getDriverListNewUrlPathBase();
-            driveListFileUrl = MyUrlUtils.addParameterPariToUrl(driveListFileUrl, DRIVE_LIST_NEW_URL_PARAMETER_KEY_SEARCHKEY, searchKey);
-            driveListFileUrl = MyUrlUtils.addParameterPariToUrl(driveListFileUrl, DRIVE_LIST_NEW_URL_PARAMETER_KEY_SEARCHKEY, searchKey);
-            File driveListFileSaveFolder = new File(downloadConfiguration.getTargetBaseFolder(), downloadConfiguration.getRealDrivesFolderName());
-            driveListFileSaveFolder = new File(MyFileUtils.fixIllegalCharactersInFilePathName(driveListFileSaveFolder.getPath()));
+            File driveListFileSaveFolder = FileUtils.getTempDirectory();
             try {
                 driveListFile = DownloadUtils.download(driveListFileUrl, driveListFileSaveFolder);
             } catch (IOException | URISyntaxException e) {
                 logger.error("download drive list file failed. catch exception:", e);
-            }
-        } else if (sourceType == DownloadConfiguration.SourceType.DriveListFile) {
-            File sourceDriveListFile = new File(downloadConfiguration.getSourceDriveListFilePath());
-            if (copyDriveListFileToTarget) {
-                File driveListFileSaveFolder = new File(downloadConfiguration.getTargetBaseFolder(), downloadConfiguration.getRealDrivesFolderName());
-                if (StringUtils.equals(sourceDriveListFile.getParentFile().getAbsolutePath(), driveListFileSaveFolder.getAbsolutePath())) {
-                    driveListFile = sourceDriveListFile;
-                } else {
-                    try {
-                        FileUtils.copyFileToDirectory(sourceDriveListFile, driveListFileSaveFolder);
-                        driveListFile = new File(driveListFileSaveFolder, sourceDriveListFile.getName());
-                    } catch (IOException e) {
-                        logger.error("failed copy drive list file. catch exception:", e);
-                    }
-                }
-            } else {
-                driveListFile = sourceDriveListFile;
             }
         }
         if (null == driveListFile) {
             logger.warn("can not get the drive list file.");
             return null;
         }
+        return driveListFile;
+    }
 
-        String driveListJSONString = null;
-        try {
-            driveListJSONString = FileUtils.readFileToString(driveListFile, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            logger.error("read {} failed. catch exception:", driveListFile, e);
+    private static String getSubDirectoryPathForDriverListFile(DownloadConfiguration downloadConfiguration, DriverListResult driveListResult) {
+        DriverListResult.DriveData data = driveListResult.getData();
+        if (null == data) {
+            logger.warn("data = null.");
             return null;
         }
-        DriveListResult driveListResult = JSON.parseObject(driveListJSONString, DriveListResult.class);
-        return driveListResult;
+
+        StringBuilder subDirPathSb = new StringBuilder();
+        try {
+            String nodeCode = data.getDriverSeriouses().get(0).getNodeCode();
+            subDirPathSb.append(nodeCode).append(File.separator);
+        } catch (Exception e) {
+            logger.warn("cannot get the product host name, so use the default folder. ignore the exception below:", e);
+        }
+        String osName = null;
+        String sysId = null == downloadConfiguration ? null : downloadConfiguration.getParameterSysId();
+        if (StringUtils.isBlank(sysId)) {
+            try {
+                osName = data.getDefaultOSes().get(0).getNAME();
+            } catch (Exception e) {
+                logger.warn("cannot get the OS name, so use the default folder. ignore the exception below:", e);
+            }
+        } else {
+            sysId = sysId.trim();
+            List<DriverListResult.DriveOS> osList = data.getOsList();
+            if (null != osList && !osList.isEmpty()) {
+                for (DriverListResult.DriveOS os : osList) {
+                    if (null == os) {
+                        continue;
+                    }
+                    String osId = os.getOSID();
+                    if (StringUtils.equals(sysId, osId)) {
+                        osName = os.getOSName();
+                    }
+                }
+            }
+        }
+        if (StringUtils.isBlank(osName)) {
+            osName = "UnknownOS";
+        }
+        subDirPathSb.append(osName);
+
+        return subDirPathSb.toString();
+    }
+
+    private static File getDriverListFolder(DownloadConfiguration downloadConfiguration, DriverListResult driveListResult) {
+        String subDirectoryPathForDriverListFile = getSubDirectoryPathForDriverListFile(downloadConfiguration, driveListResult);
+        File drivesFolder = null == downloadConfiguration ? null :
+                new File(downloadConfiguration.getTargetBaseFolder(), downloadConfiguration.getRealDrivesFolderName());
+        if (StringUtils.isBlank(subDirectoryPathForDriverListFile)) {
+            return drivesFolder;
+        } else {
+            return new File(drivesFolder, subDirectoryPathForDriverListFile);
+        }
     }
 
 
     /**
-     * @param downloadConfiguration
-     * @param driveListResult
+     * @param downloadConfiguration downloadConfiguration
+     * @param driveListResult       driveListResult
      */
-    private static void downloadDriveListByDriveListResult(DownloadConfiguration downloadConfiguration, DriveListResult driveListResult)
+    private static void downloadDriveListByDriveListResult(DownloadConfiguration downloadConfiguration, DriverListResult driveListResult)
             throws Exception {
         if (null == downloadConfiguration) {
             logger.warn("downloadConfiguration = null");
@@ -139,40 +199,18 @@ public class DriveDownloadTask {
             return;
         }
 
-        //
-        File drivesFolder = new File(downloadConfiguration.getTargetBaseFolder(), downloadConfiguration.getRealDrivesFolderName());
-
-        DriveListResult.DriveData data = driveListResult.getData();
+        DriverListResult.DriveData data = driveListResult.getData();
         if (null == data) {
             logger.warn("data = null.");
             return;
         }
-
-        try {
-            String nodeCode = data.getDriverSeriouses().get(0).getNodeCode();
-            drivesFolder = new File(drivesFolder, nodeCode);
-        } catch (Exception e) {
-            logger.warn("cannot get the product host name, so use the default folder. ignore the exception below:", e);
-        }
-//        try {
-//            String nodeCode = data.getDriverMTList().get(0).getNodeCode();
-//            drivesFolder = new File(drivesFolder, nodeCode);
-//        } catch (Exception e) {
-//            logger.warn("cannot get the product type, so use the default folder. ignore the exception below:", e);
-//        }
-        try {
-            String osName = data.getDefaultOSes().get(0).getNAME();
-            drivesFolder = new File(drivesFolder, osName);
-        } catch (Exception e) {
-            logger.warn("cannot get the OS name, so use the default folder. ignore the exception below:", e);
-        }
-        List<DriveListResult.DrivePart> partList = data.getPartList();
+        File driverListFolder = getDriverListFolder(downloadConfiguration, driveListResult);
+        List<DriverListResult.DrivePart> partList = data.getPartList();
         if (CollectionUtils.isEmpty(partList)) {
             logger.warn("no available drives");
             return;
         }
-
-        for (DriveListResult.DrivePart drivePart : partList) {
+        for (DriverListResult.DrivePart drivePart : partList) {
             if (null == drivePart) {
                 continue;
             }
@@ -181,16 +219,18 @@ public class DriveDownloadTask {
                 continue;
             }
             partName = StringEscapeUtils.unescapeJava(partName);
-            File drivePartFolder = new File(drivesFolder, drivePart.getPartName());
+            File drivePartFolder = new File(driverListFolder, partName);
             if (!drivePartFolder.isDirectory()) {
-                drivePartFolder.mkdirs();
+                if (!drivePartFolder.mkdirs()) {
+                    logger.warn("failed to make directory: {}", drivePartFolder);
+                }
             }
 
-            List<DriveListResult.Drive> driveList = drivePart.getDrivelist();
+            List<DriverListResult.Drive> driveList = drivePart.getDrivelist();
             if (CollectionUtils.isEmpty(driveList)) {
                 return;
             }
-            for (DriveListResult.Drive drive : driveList) {
+            for (DriverListResult.Drive drive : driveList) {
                 if (null == drive) {
                     continue;
                 }
@@ -200,7 +240,9 @@ public class DriveDownloadTask {
                 File driveFolder = new File(drivePartFolder, driverName);
                 driveFolder = new File(MyFileUtils.fixIllegalCharactersInFilePathName(driveFolder.getPath()));
                 if (!driveFolder.isDirectory()) {
-                    driveFolder.mkdirs();
+                    if (!driveFolder.mkdirs()) {
+                        logger.warn("failed to make directory: {}", driveFolder);
+                    }
                 }
                 String filePath = drive.getFilePath();
                 logger.debug("down: {}, folder: {}", filePath, driveFolder);
