@@ -107,11 +107,13 @@ public class DriveDownloadTask {
             } else {
                 driveListFileUrl = MyUrlUtils.addParameterPariToUrl(driveListFileUrl, DRIVE_LIST_NEW_URL_PARAMETER_KEY_SEARCH_KEY, searchKey);
             }
-            if (StringUtils.isNotBlank(sysId)) {
-                logger.warn("searchKey = {}", searchKey);
+            logger.info("driveListFileUrl_1 = {}", driveListFileUrl);
+            if (StringUtils.isBlank(sysId)) {
+                logger.warn("sysId = {}", sysId);
             } else {
-                driveListFileUrl = MyUrlUtils.addParameterPariToUrl(sysId, DRIVE_LIST_NEW_URL_PARAMETER_KEY_SYS_ID, searchKey);
+                driveListFileUrl = MyUrlUtils.addParameterPariToUrl(driveListFileUrl, DRIVE_LIST_NEW_URL_PARAMETER_KEY_SYS_ID, sysId);
             }
+            logger.info("driveListFileUrl_2 = {}", driveListFileUrl);
             File driveListFileSaveFolder = FileUtils.getTempDirectory();
             try {
                 driveListFile = DownloadUtils.download(driveListFileUrl, driveListFileSaveFolder);
