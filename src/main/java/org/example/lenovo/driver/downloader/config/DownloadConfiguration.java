@@ -30,22 +30,44 @@ public class DownloadConfiguration {
     }
 
     /**
+     * 驱动下载站点类型
+     */
+    public enum DriverSiteType {
+        /**
+         * 从Lenovo官网下载：https://newsupport.lenovo.com.cn/driveList.html
+         */
+        Lenovo,
+        /**
+         * 从ThinkPad官网下载：https://newthink.lenovo.com.cn/driveList.html
+         */
+        ThinkPad,
+    }
+
+    /**
      * 配置源类型
      */
     private SourceType sourceType;
 
     /**
+     * 驱动下载站点类型
+     */
+    private DriverSiteType driverSiteType = DriverSiteType.Lenovo;
+
+    /**
      * 配置源类型 {@link #sourceType}是{@link SourceType#URL}时配置
      */
     private String driverListNewUrlPathBase;
+
     /**
      * 下载目录跟目录
      */
     private String targetBaseFolder;
+
     /**
      * 驱动列表文件目录名称
      */
     private String driveListFileFolderName = "driveListFile";
+
     /**
      * 驱动文件目录名称
      */
@@ -62,6 +84,7 @@ public class DownloadConfiguration {
      * @see #useDateAsSubFolder
      */
     private Date downloadDate;
+
     /**
      * 日期样式
      *
@@ -76,6 +99,7 @@ public class DownloadConfiguration {
      * @see SourceType#URL
      */
     private String parameterSearchKey;
+
     /**
      * url参数 sysid  例如 42
      *
@@ -83,6 +107,7 @@ public class DownloadConfiguration {
      * @see SourceType#URL
      */
     private String parameterSysId;
+
     /**
      * 驱动列表文件路径 {@link #sourceType}是{@link SourceType#DriveListFile}时配置
      *
@@ -90,6 +115,13 @@ public class DownloadConfiguration {
      * @see SourceType#DriveListFile
      */
     private String sourceDriveListFilePath;
+
+    /**
+     * 失败后重试的次数。
+     * 其中，无效值（负值）表示失败后一直重试，直到成功。
+     * 默认无限次重试。
+     */
+    private int retryTimesWhenFail = -1;
 
     /**
      * 工作线程数

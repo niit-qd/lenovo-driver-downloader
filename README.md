@@ -30,6 +30,7 @@ com:
             # 工作线程属
             work-threads-count: 10
 ```
+---
 
 ### url参数的获取
 url的参数是从官方驱动网站的请求中获取的，需要自行查找。<br>
@@ -54,3 +55,76 @@ url的参数是从官方驱动网站的请求中获取的，需要自行查找�
     https://newthink.lenovo.com.cn/api/ThinkHome/Machine/DriveListInfo?search_key=15272&system_id=248<br>
     从上面url中获取产品key`search_key`和系统id`system_id`。`system_id`不存在时表示默认。
     此url，不可用于`Lenovo`产品驱动的查询。
+
+---
+
+### 对于部分旧机型无法找到驱动下载页的问题的处理
+
+在[搜索页](https://newthink.lenovo.com.cn/driverdownload.html)，输入关键字，会有，注意请求中有下面这种请求
+```http request
+https://newthink.lenovo.com.cn/api/ThinkHome/ProductLine/SearchProductLine?search_key=E530&page_index=1&page_size=100
+```
+这里的关键参数是`search_key`，可以手动将要查询的机型替换该参数的值，请求即可。得到如下形式的返回值：
+```json
+{
+    "statusCode": 200,
+    "message": {
+        "info": "Success"
+    },
+    "data": {
+        "total": 2,
+        "data": [
+            {
+                "product_line_id": "10203",
+                "product_line_name": "ThinkPad E530/E530c",
+                "product_line_alias": "ThinkPad E530/E530c",
+                "parent_id": "9103",
+                "is_last": "1",
+                "product_line_position": "0",
+                "product_line_image": "https://webdoc.lenovo.com.cn/think/machinepic/thinkpade530_s.jpg",
+                "link_id": "-9425",
+                "link_sub_id_list": "",
+                "link_parent_id": "-7760",
+                "link_parent_name": "",
+                "product_line_status": "0",
+                "product_line": "120",
+                "product_line_type": "12",
+                "product_line_memo": "",
+                "order_number": "54",
+                "dirver_logic_type": "0",
+                "is_tj": "0",
+                "is_top": "0",
+                "is_hot": "0",
+                "is_driver": "1"
+            },
+            {
+                "product_line_id": "10641",
+                "product_line_name": "扬天E5300d",
+                "product_line_alias": "扬天E5300d",
+                "parent_id": "3492",
+                "is_last": "1",
+                "product_line_position": "2",
+                "product_line_image": "https://webdoc.lenovo.com.cn/think/MachinePic/扬天ei_s.jpg",
+                "link_id": "-8942",
+                "link_sub_id_list": "",
+                "link_parent_id": "647",
+                "link_parent_name": "",
+                "product_line_status": "2",
+                "product_line": "119",
+                "product_line_type": "1",
+                "product_line_memo": "",
+                "order_number": "3460",
+                "dirver_logic_type": "1",
+                "is_tj": "0",
+                "is_top": "0",
+                "is_hot": "0",
+                "is_driver": "1"
+            }
+        ]
+    }
+}
+```
+这里取值`product_line_id`，作为上面配置参数`parameter-search-key`的值即可。
+由于可能有多个值，根据`product_line_name`或`product_line_alias`的值进行判断真正所需要的机型id即可。
+如果名称显示为unicode编码，自行转码即可。
+

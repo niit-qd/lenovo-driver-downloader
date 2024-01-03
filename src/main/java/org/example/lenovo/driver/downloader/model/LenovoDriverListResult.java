@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class DriverListResult {
+public class LenovoDriverListResult {
     private String statusCode;
     private String message;
     private DriveData data;
