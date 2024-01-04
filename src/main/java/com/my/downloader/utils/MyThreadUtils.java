@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 
 /**
- * @author
+ * @author hw
  */
 public class MyThreadUtils {
 
@@ -18,8 +18,8 @@ public class MyThreadUtils {
     /**
      * 在线程池中执行多个任务。所有任务都异步执行，所有任务都完成后，程序退出。
      *
-     * @param executor
-     * @param tasks
+     * @param executor ThreadPoolTaskExecutor
+     * @param tasks    Runnable 集合
      */
     public static void executeBatchTasks(ThreadPoolTaskExecutor executor, Collection<Runnable> tasks) {
         if (null == executor) {
@@ -33,16 +33,14 @@ public class MyThreadUtils {
             if (null == task) {
                 latch.countDown();
             }
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        task.run();
-                    } catch (Exception e) {
-                        logger.error(null, e);
-                    } finally {
-                        latch.countDown();
-                    }
+            executor.execute(() -> {
+                try {
+                    assert task != null;
+                    task.run();
+                } catch (Exception e) {
+                    logger.error(null, e);
+                } finally {
+                    latch.countDown();
                 }
             });
         }

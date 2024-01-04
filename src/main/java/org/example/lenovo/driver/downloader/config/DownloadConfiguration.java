@@ -10,7 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * @author
+ * @author hw
  */
 @Data
 public class DownloadConfiguration {
@@ -34,11 +34,11 @@ public class DownloadConfiguration {
      */
     public enum DriverSiteType {
         /**
-         * 从Lenovo官网下载：https://newsupport.lenovo.com.cn/driveList.html
+         * 从Lenovo官网下载：<a href="https://newsupport.lenovo.com.cn/driveList.html">Lenovo</a>
          */
         Lenovo,
         /**
-         * 从ThinkPad官网下载：https://newthink.lenovo.com.cn/driveList.html
+         * 从ThinkPad官网下载：<a href="https://newthink.lenovo.com.cn/driveList.html">ThinkPad</a>
          */
         ThinkPad,
     }
@@ -135,7 +135,7 @@ public class DownloadConfiguration {
     /**
      * 获取驱动列表文件目录
      *
-     * @return
+     * @return 驱动列表文件目录
      */
     public String getDriveListFileFolderName() {
         String saveDateStr = getSaveDateString();
@@ -149,7 +149,7 @@ public class DownloadConfiguration {
     /**
      * 获取驱动列表文件目录
      *
-     * @return
+     * @return 驱动列表文件目录
      */
     public String getRealDrivesFolderName() {
         String saveDateStr = getSaveDateString();
@@ -163,8 +163,7 @@ public class DownloadConfiguration {
     /**
      * 获取目录保存时间字符串形式。在{@link #saveDatePattern}有效时可用。
      *
-     * @return
-     * @throws IllegalArgumentException
+     * @return 目录保存时间字符串形式
      */
     private String getSaveDateString() throws IllegalArgumentException {
         if (useDateAsSubFolder) {

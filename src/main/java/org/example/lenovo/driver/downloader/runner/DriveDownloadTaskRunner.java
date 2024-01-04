@@ -15,24 +15,24 @@ import org.springframework.stereotype.Component;
 /**
  * @author czx
  */
+@Setter
+@Getter
 @ConfigurationProperties(prefix = "com.example.lenovo.driver.downloader")
 @Component
 public class DriveDownloadTaskRunner implements ApplicationRunner, CommandLineRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(DriveDownloadTaskRunner.class);
 
-    @Getter
-    @Setter
     private DownloadConfiguration downloadConfiguration;
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) {
         logger.info("downloadConfiguration = {}", downloadConfiguration);
 
         DriveDownloadTask.downloadDriveList(downloadConfiguration);
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
     }
 }

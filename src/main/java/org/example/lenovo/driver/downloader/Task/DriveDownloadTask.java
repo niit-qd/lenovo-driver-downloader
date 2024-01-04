@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.my.downloader.utils.DownloadUtils;
 import com.my.downloader.utils.MyFileUtils;
 import com.my.downloader.utils.MyUrlUtils;
+import me.tongfei.progressbar.ProgressBar;
+import me.tongfei.progressbar.ProgressBarBuilder;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
@@ -16,6 +18,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -63,9 +66,6 @@ public class DriveDownloadTask {
             }
         } else if (downloadConfiguration.getDriverSiteType() == DownloadConfiguration.DriverSiteType.ThinkPad) {
             logger.warn("haven't implement the DriverSiteType: {}", downloadConfiguration.getDriverSiteType());
-            return;
-        } else {
-            return;
         }
 
     }
@@ -109,8 +109,8 @@ public class DriveDownloadTask {
             String driveListFileUrl = downloadConfiguration.getDriverListNewUrlPathBase();
             String searchKey = downloadConfiguration.getParameterSearchKey();
             String sysId = downloadConfiguration.getParameterSysId();
-            String requestUrlParameterKeySearchKey = null;
-            String requestUrlParameterKeySystemId = null;
+            String requestUrlParameterKeySearchKey;
+            String requestUrlParameterKeySystemId;
             if (downloadConfiguration.getDriverSiteType() == DownloadConfiguration.DriverSiteType.Lenovo) {
                 requestUrlParameterKeySearchKey = DriverListUrlConstants.LenovoUrl.PARAMETER_KEY_SEARCH_KEY;
                 requestUrlParameterKeySystemId = DriverListUrlConstants.LenovoUrl.PARAMETER_KEY_SYS_ID;
@@ -140,7 +140,7 @@ public class DriveDownloadTask {
             logger.info("driveListFileUrl = {}", driveListFileUrl);
             File driveListFileSaveFolder = FileUtils.getTempDirectory();
             try {
-                driveListFile = DownloadUtils.download(driveListFileUrl, driveListFileSaveFolder);
+                driveListFile = DownloadUtils.download(driveListFileUrl, driveListFileSaveFolder, null);
             } catch (IOException | URISyntaxException e) {
                 logger.error("download drive list file failed. catch exception:", e);
             }
@@ -213,8 +213,7 @@ public class DriveDownloadTask {
      * @param downloadConfiguration downloadConfiguration
      * @param driveListResult       driveListResult
      */
-    private static void downloadDriveListByLenovoDriveListResult(DownloadConfiguration downloadConfiguration, LenovoDriverListResult driveListResult)
-            throws Exception {
+    private static void downloadDriveListByLenovoDriveListResult(DownloadConfiguration downloadConfiguration, LenovoDriverListResult driveListResult) {
         if (null == downloadConfiguration) {
             logger.warn("downloadConfiguration = null");
             return;
@@ -274,13 +273,48 @@ public class DriveDownloadTask {
                 }
                 String filePath = drive.getFilePath();
                 logger.info("will down, name = {}, url = {}, folder = {}", drive.getDriverName(), filePath, driveFolder);
+                if (StringUtils.isBlank(filePath)) {
+                    // 某些驱动，存在下载地址为空的情况。"FileType": ""
+                    downloadFailedDrives.add(drive);
+                    continue;
+                }
                 int retryTime = 0;
                 while (true) {
                     try {
-                        DownloadUtils.download(filePath, driveFolder);
+                        // Expect display default progress bar style:
+                        // 100% │███████████████████████████████████████████│ 10/10k (0:00:12 / 0:00:00)
+                        DownloadUtils.download(filePath, driveFolder, new DownloadUtils.DownloadProgressCallback() {
+
+                            ProgressBarBuilder builder = null;
+                            ProgressBar bar = null;
+
+                            @Override
+                            public void onDownloadStarted(String url, File targetFolder, String defaultFileName, boolean getFileNameFromUrl, long length) {
+                                builder = new ProgressBarBuilder()
+                                        .setUnit("b", 1)
+                                        .setInitialMax(length);
+                                bar = builder.build();
+                            }
+
+                            @Override
+                            public void onDownloadProgressChanged(String url, File targetFolder, String defaultFileName, boolean getFileNameFromUrl, long progress, long length) {
+                                if (null != bar) {
+                                    bar.stepTo(progress);
+                                }
+                            }
+
+                            @Override
+                            public void onDownloadCompleted(String url, File targetFolder, String defaultFileName, boolean getFileNameFromUrl, long progress, long length, int result, Exception exception) {
+
+                            }
+                        });
                         break;
                     } catch (Exception e) {
-                        if (downloadConfiguration.getRetryTimesWhenFail() < 0) {
+                        if (e instanceof MalformedURLException) {
+                            logger.error("failed to download driver, maybe the download url is illegal. path = {}, driver: {}", filePath, drive, e);
+                            downloadFailedDrives.add(drive);
+                            break;
+                        } else if (downloadConfiguration.getRetryTimesWhenFail() < 0) {
                             logger.error("failed to download and retry to download driver: {}", drive, e);
                         } else {
                             if (retryTime < downloadConfiguration.getRetryTimesWhenFail()) {

@@ -52,19 +52,26 @@ For further reference, please consider the following sections:
    ```
    注意：使用`--`来指定spring的属性参数。
    [Running from the Command Line](https://docs.spring.io/spring-boot/docs/2.6.6/reference/htmlsingle/#howto.batch.running-from-the-command-line)
-   > Spring Boot converts any command line argument starting with `--` to a property to add to the `Environment`, see [accessing command line properties](https://docs.spring.io/spring-boot/docs/2.6.6/reference/htmlsingle/#features.external-config.command-line-args). This should not be used to pass arguments to batch jobs. To specify batch arguments on the command line, use the regular format (that is without `--`), as shown in the following example:
+   > Spring Boot converts any command line argument starting with `--` to a property to add to the `Environment`,
+   see [accessing command line properties](https://docs.spring.io/spring-boot/docs/2.6.6/reference/htmlsingle/#features.external-config.command-line-args).
+   This should not be used to pass arguments to batch jobs. To specify batch arguments on the command line, use the
+   regular format (that is without `--`), as shown in the following example:
    > ``` shell
    > $ java -jar myapp.jar someParameter=someValue anotherParameter=anotherValue
    > ```
-   > If you specify a property of the Environment on the command line, it is ignored by the job. Consider the following command:
+   > If you specify a property of the Environment on the command line, it is ignored by the job. Consider the following
+   command:
    > ``` shell
    > $ java -jar myapp.jar --server.port=7070 someParameter=someValue
    > ```
    > This provides only one argument to the batch job: `someParameter=someValue`.
 
    [7.2.1. Accessing Command Line Properties](https://docs.spring.io/spring-boot/docs/2.6.6/reference/htmlsingle/#features.external-config.command-line-args)
-   > By default, `SpringApplication` converts any command line option arguments (that is, arguments starting with `--`, such as `--server.port=9000`) to a property and adds them to the Spring Environment. As mentioned previously, command line properties always take precedence over file-based property sources.
-   > If you do not want command line properties to be added to the `Environment`, you can disable them by using `SpringApplication.setAddCommandLineProperties(false)`.
+   > By default, `SpringApplication` converts any command line option arguments (that is, arguments starting with `--`,
+   such as `--server.port=9000`) to a property and adds them to the Spring Environment. As mentioned previously, command
+   line properties always take precedence over file-based property sources.
+   > If you do not want command line properties to be added to the `Environment`, you can disable them by
+   using `SpringApplication.setAddCommandLineProperties(false)`.
 4. Windows的Terminal下中文乱码
    在Windows下，执行`mvn clean spring-boot:run`或`java -jar xxx.jar`的时候，遇到中文会出现乱码。
    可以使用`chcp`指令修正。

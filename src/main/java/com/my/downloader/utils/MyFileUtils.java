@@ -5,16 +5,16 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 
 /**
- * @author
+ * @author hw
  */
 public class MyFileUtils {
     /**
      * 获取相对路径
      *
      * @param baseFile            如果是不是目录，则返回其父目录进行比较
-     * @param file
+     * @param file                当前文件
      * @param forceBaseFileFolder 强制认为baseFile是目录。
-     * @return
+     * @return 相对路径
      */
     public static String getRelativePath(File baseFile, File file, boolean forceBaseFileFolder) {
         if (null == baseFile || null == file) {
@@ -64,8 +64,8 @@ public class MyFileUtils {
     /**
      * 替换文件路径子段上的非法字符：\/:*?"<>|。替换符是单个的空字符串" "。
      *
-     * @param filePath
-     * @return
+     * @param filePath 预设的文件路径，可能包含一些不能用在路径上的字符
+     * @return 修改后的可以放在路径上的字符串
      */
     public static String fixIllegalCharactersInFilePathName(String filePath) {
         return fixIllegalCharactersInFilePathName(filePath, " ");
@@ -74,9 +74,9 @@ public class MyFileUtils {
     /**
      * 替换文件路径子段上的非法字符：\/:*?"<>|
      *
-     * @param filePath
+     * @param filePath                    预设的文件路径，可能包含一些不能用在路径上的字符
      * @param illegalCharacterReplacement 如果是null，则使用空字符""代替。
-     * @return
+     * @return 修改后的可以放在路径上的字符串
      */
     public static String fixIllegalCharactersInFilePathName(String filePath, String illegalCharacterReplacement) {
         if (null == filePath) {
@@ -104,7 +104,7 @@ public class MyFileUtils {
                 startIndex = 0;
             }
             // 2. Linux 路径。根：/
-            else if ("".equals(seg0)) {
+            else if (seg0.isEmpty()) {
                 sb.append(File.separator);
                 startIndex = 1;
             }
