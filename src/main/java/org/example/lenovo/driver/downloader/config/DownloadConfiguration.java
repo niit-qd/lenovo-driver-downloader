@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author hw
@@ -43,10 +44,38 @@ public class DownloadConfiguration {
         ThinkPad,
     }
 
-    /**
-     * 配置源类型
-     */
-    private SourceType sourceType;
+    @Data
+    public static class UrlParameterConfig {
+
+        /**
+         * 配置源类型
+         */
+        private SourceType sourceType;
+
+        /**
+         * 驱动列表文件路径 {@link #sourceType}是{@link SourceType#DriveListFile}时配置
+         *
+         * @see #sourceType
+         * @see SourceType#DriveListFile
+         */
+        private String sourceDriveListFilePath;
+
+        /**
+         * url参数 searchKey  例如 3977
+         *
+         * @see #sourceType
+         * @see SourceType#URL
+         */
+        private String parameterSearchKey;
+
+        /**
+         * url参数 sysid  例如 42
+         *
+         * @see #sourceType
+         * @see SourceType#URL
+         */
+        private String parameterSysId;
+    }
 
     /**
      * 驱动下载站点类型
@@ -92,29 +121,7 @@ public class DownloadConfiguration {
      */
     private String saveDatePattern = "yyyyMMddHHmmss";
 
-    /**
-     * url参数 searchKey  例如 3977
-     *
-     * @see #sourceType
-     * @see SourceType#URL
-     */
-    private String parameterSearchKey;
-
-    /**
-     * url参数 sysid  例如 42
-     *
-     * @see #sourceType
-     * @see SourceType#URL
-     */
-    private String parameterSysId;
-
-    /**
-     * 驱动列表文件路径 {@link #sourceType}是{@link SourceType#DriveListFile}时配置
-     *
-     * @see #sourceType
-     * @see SourceType#DriveListFile
-     */
-    private String sourceDriveListFilePath;
+    private List<UrlParameterConfig> urlParameterConfigs;
 
     /**
      * 失败后重试的次数。

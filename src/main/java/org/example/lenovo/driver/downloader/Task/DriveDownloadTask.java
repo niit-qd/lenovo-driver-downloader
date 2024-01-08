@@ -36,38 +36,48 @@ public class DriveDownloadTask {
 
 
     public static void downloadDriveList(DownloadConfiguration downloadConfiguration) {
-        // get or download the driver list file
-        File driveListResultFile = obtainDriveListFile(downloadConfiguration);
-        if (null == driveListResultFile) {
-            logger.warn("driveListResultFile = null");
+        List<DownloadConfiguration.UrlParameterConfig> urlParameterConfigs = downloadConfiguration.getUrlParameterConfigs();
+        if (null == urlParameterConfigs || urlParameterConfigs.isEmpty()) {
+            logger.warn("urlParameterConfigs is blank.");
             return;
         }
+        int urlParameterConfigsSize = urlParameterConfigs.size();
 
-        if (downloadConfiguration.getDriverSiteType() == DownloadConfiguration.DriverSiteType.Lenovo) {
-            // parse driver list file
-            LenovoDriverListResult lenovoDriverListResult = parseLenovoDriveListFromFile(driveListResultFile);
+        // get or download the driver list file
+        for (int i = 0; i < urlParameterConfigsSize; i++) {
+            File driveListResultFile = obtainDriveListFile(downloadConfiguration, i);
+            if (null == driveListResultFile) {
+                continue;
+            }
+            String sysId = downloadConfiguration.getUrlParameterConfigs().get(i).getParameterSysId();
 
-            // copy(save) driver list file
-            File lenovoDriverListFolder = getDriverListFolder(downloadConfiguration, lenovoDriverListResult);
-            if (null != lenovoDriverListFolder &&
-                    !StringUtils.equals(driveListResultFile.getParentFile().getAbsolutePath(), lenovoDriverListFolder.getAbsolutePath())) {
-                try {
-                    FileUtils.copyFileToDirectory(driveListResultFile, lenovoDriverListFolder);
-                } catch (IOException e) {
-                    logger.error("failed copy drive list file. catch exception:", e);
+            if (downloadConfiguration.getDriverSiteType() == DownloadConfiguration.DriverSiteType.Lenovo) {
+
+                // parse driver list file
+                LenovoDriverListResult lenovoDriverListResult = parseLenovoDriveListFromFile(driveListResultFile);
+
+                // copy(save) driver list file
+                File lenovoDriverListFolder = getDriverListFolder(downloadConfiguration, lenovoDriverListResult, sysId);
+                if (null != lenovoDriverListFolder &&
+                        !StringUtils.equals(driveListResultFile.getParentFile().getAbsolutePath(), lenovoDriverListFolder.getAbsolutePath())) {
+                    try {
+                        FileUtils.copyFileToDirectory(driveListResultFile, lenovoDriverListFolder);
+                    } catch (IOException e) {
+                        logger.error("failed copy drive list file. catch exception:", e);
+                    }
                 }
-            }
 
-            // download drivers
-            try {
-                downloadDriveListByLenovoDriveListResult(downloadConfiguration, lenovoDriverListResult);
-            } catch (Exception e) {
-                logger.error("", e);
+                // download drivers
+                try {
+                    downloadDriveListByLenovoDriveListResult(downloadConfiguration, lenovoDriverListResult, sysId);
+                } catch (Exception e) {
+                    logger.error("", e);
+                }
+
+            } else if (downloadConfiguration.getDriverSiteType() == DownloadConfiguration.DriverSiteType.ThinkPad) {
+                logger.warn("haven't implement the DriverSiteType: {}", downloadConfiguration.getDriverSiteType());
             }
-        } else if (downloadConfiguration.getDriverSiteType() == DownloadConfiguration.DriverSiteType.ThinkPad) {
-            logger.warn("haven't implement the DriverSiteType: {}", downloadConfiguration.getDriverSiteType());
         }
-
     }
 
     private static LenovoDriverListResult parseLenovoDriveListFromFile(File lenovoDriveListResultFile) {
@@ -85,14 +95,28 @@ public class DriveDownloadTask {
         return JSON.parseObject(driveListJSONString, LenovoDriverListResult.class);
     }
 
-    private static File obtainDriveListFile(DownloadConfiguration downloadConfiguration) {
+    /**
+     * 获取指定的下载列表文件
+     *
+     * @param downloadConfiguration 下载配置
+     * @param index                 驱动列表索引 有效范围是[0, {@linkplain DownloadConfiguration#getUrlParameterConfigs()}.size]。
+     * @return 驱动下载文件
+     */
+    private static File obtainDriveListFile(DownloadConfiguration downloadConfiguration, int index) {
 
         if (null == downloadConfiguration) {
             logger.warn("downloadConfiguration = null");
             return null;
         }
 
-        DownloadConfiguration.SourceType sourceType = downloadConfiguration.getSourceType();
+        List<DownloadConfiguration.UrlParameterConfig> urlParameterConfigs = downloadConfiguration.getUrlParameterConfigs();
+        if (null == urlParameterConfigs || index >= urlParameterConfigs.size()) {
+            logger.warn("index:{} is not in the range of [0, {}].", index, null == urlParameterConfigs ? 0 : urlParameterConfigs.size());
+            return null;
+        }
+        DownloadConfiguration.UrlParameterConfig urlParameterConfig = urlParameterConfigs.get(index);
+
+        DownloadConfiguration.SourceType sourceType = urlParameterConfig.getSourceType();
         if (null == sourceType) {
             logger.warn("sourceType == null");
             return null;
@@ -104,11 +128,11 @@ public class DriveDownloadTask {
 
         File driveListFile = null;
         if (sourceType == DownloadConfiguration.SourceType.DriveListFile) {
-            driveListFile = new File(downloadConfiguration.getSourceDriveListFilePath());
+            driveListFile = new File(urlParameterConfig.getSourceDriveListFilePath());
         } else if (sourceType == DownloadConfiguration.SourceType.URL) {
             String driveListFileUrl = downloadConfiguration.getDriverListNewUrlPathBase();
-            String searchKey = downloadConfiguration.getParameterSearchKey();
-            String sysId = downloadConfiguration.getParameterSysId();
+            String searchKey = urlParameterConfig.getParameterSearchKey();
+            String sysId = urlParameterConfig.getParameterSysId();
             String requestUrlParameterKeySearchKey;
             String requestUrlParameterKeySystemId;
             if (downloadConfiguration.getDriverSiteType() == DownloadConfiguration.DriverSiteType.Lenovo) {
@@ -152,7 +176,7 @@ public class DriveDownloadTask {
         return driveListFile;
     }
 
-    private static String getSubDirectoryPathForDriverListFile(DownloadConfiguration downloadConfiguration, LenovoDriverListResult driveListResult) {
+    private static String getSubDirectoryPathForDriverListFile(LenovoDriverListResult driveListResult, String sysId) {
         LenovoDriverListResult.DriveData data = driveListResult.getData();
         if (null == data) {
             logger.warn("data = null.");
@@ -167,7 +191,6 @@ public class DriveDownloadTask {
             logger.warn("cannot get the product host name, so use the default folder. ignore the exception below:", e);
         }
         String osName = null;
-        String sysId = null == downloadConfiguration ? null : downloadConfiguration.getParameterSysId();
         if (StringUtils.isBlank(sysId)) {
             try {
                 osName = data.getDefaultOSes().get(0).getNAME();
@@ -197,8 +220,8 @@ public class DriveDownloadTask {
         return subDirPathSb.toString();
     }
 
-    private static File getDriverListFolder(DownloadConfiguration downloadConfiguration, LenovoDriverListResult driveListResult) {
-        String subDirectoryPathForDriverListFile = getSubDirectoryPathForDriverListFile(downloadConfiguration, driveListResult);
+    private static File getDriverListFolder(DownloadConfiguration downloadConfiguration, LenovoDriverListResult driveListResult, String sysId) {
+        String subDirectoryPathForDriverListFile = getSubDirectoryPathForDriverListFile(driveListResult, sysId);
         File drivesFolder = null == downloadConfiguration ? null :
                 new File(downloadConfiguration.getTargetBaseFolder(), downloadConfiguration.getRealDrivesFolderName());
         if (StringUtils.isBlank(subDirectoryPathForDriverListFile)) {
@@ -212,8 +235,9 @@ public class DriveDownloadTask {
     /**
      * @param downloadConfiguration downloadConfiguration
      * @param driveListResult       driveListResult
+     * @param sysId                 sysId
      */
-    private static void downloadDriveListByLenovoDriveListResult(DownloadConfiguration downloadConfiguration, LenovoDriverListResult driveListResult) {
+    private static void downloadDriveListByLenovoDriveListResult(DownloadConfiguration downloadConfiguration, LenovoDriverListResult driveListResult, String sysId) {
         if (null == downloadConfiguration) {
             logger.warn("downloadConfiguration = null");
             return;
@@ -229,7 +253,7 @@ public class DriveDownloadTask {
             logger.warn("data = null.");
             return;
         }
-        File driverListFolder = getDriverListFolder(downloadConfiguration, driveListResult);
+        File driverListFolder = getDriverListFolder(downloadConfiguration, driveListResult, sysId);
         List<LenovoDriverListResult.DrivePart> partList = data.getPartList();
         if (CollectionUtils.isEmpty(partList)) {
             logger.warn("no available drives");
