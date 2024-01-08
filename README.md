@@ -12,22 +12,34 @@ com:
       driver:
         downloader:
           download-configuration:
-            # 配置源类型：URL（需要配置driver-list-new-url-path-base）、DriveListFile
-            source-type: URL
+            # 驱动下载站点类型: Lenovo, ThinkPad
+            driver-site-type: Lenovo
             # 驱动列表下载的基础url 适配：source-type: URL
             driver-list-new-url-path-base: https://newsupport.lenovo.com.cn/api/drive/drive_listnew
             # 驱动存放目录 适配：source-type: URL
             target-base-folder: target/drives
             # 驱动列表文件路径 适配：source-type: DriveListFile
-            # source-drive-list-file-path: target/drives/20220708224501/drives/drive_listnew
+            # source-drive-list-file-path: ../drivers/drive_listnew
             drives-folder-name: drives
             # 是否使用日期作为下载目录的子目录 适配：save-date-pattern
-            use-date-as-sub-folder: true
+            use-date-as-forder-path-segment: true
+            # 是否为每个驱动配置一个不同的下载时间。默认为false。
+            use-same-date-for-each-url-parameter-config: false
             # 日期样式 适配：use-date-as-sub-folder
             save-date-pattern: yyyyMMddHHmmss
-            # url参数
-            parameter-search-key: 12357
-            parameter-sys-id: 42
+            url-parameter-configs:
+              - # 配置源类型：URL（需要配置driver-list-new-url-path-base）、DriveListFile
+                source-type: URL
+                # url参数
+                parameter-search-key: 10203
+                parameter-sys-id: 26
+              - # 配置源类型：URL（需要配置driver-list-new-url-path-base）、DriveListFile
+                source-type: URL
+                # url参数
+                parameter-search-key: 10203
+                parameter-sys-id: 42
+            # 失败后的重试次数 默认负值（无限次）
+            retry-times-when-fail: -1
             # 工作线程属
             work-threads-count: 10
 ```
@@ -61,6 +73,8 @@ url的参数是从官方驱动网站的请求中获取的，需要自行查找�
       此url，不可用于`Lenovo`产品驱动的查询。
 
 ---
+
+*由于无法正确获取远程驱动文件的真实大小，所以实际检测进度的时候，计算值是不准确的。*
 
 ### 对于部分旧机型无法找到驱动下载页的问题的处理
 

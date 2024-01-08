@@ -14,7 +14,9 @@ com:
             # source-drive-list-file-path: ../drivers/drive_listnew
             drives-folder-name: drives
             # 是否使用日期作为下载目录的子目录 适配：save-date-pattern
-            use-date-as-sub-folder: true
+            use-date-as-forder-path-segment: true
+            # 是否为每个驱动配置一个不同的下载时间。默认为false。
+            use-same-date-for-each-url-parameter-config: false
             # 日期样式 适配：use-date-as-sub-folder
             save-date-pattern: yyyyMMddHHmmss
             url-parameter-configs:

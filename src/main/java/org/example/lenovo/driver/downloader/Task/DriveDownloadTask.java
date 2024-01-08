@@ -44,20 +44,29 @@ public class DriveDownloadTask {
         int urlParameterConfigsSize = urlParameterConfigs.size();
 
         // get or download the driver list file
+        File baseDrivesFolder = new File(downloadConfiguration.getTargetBaseFolder(), downloadConfiguration.getRealDrivesFolderName());
         for (int i = 0; i < urlParameterConfigsSize; i++) {
+            DownloadConfiguration.UrlParameterConfig urlParameterConfig = urlParameterConfigs.get(i);
+            logger.info("driver list index = {}/{}: urlParameterConfig = {}", i + 1, urlParameterConfigsSize, urlParameterConfig);
             File driveListResultFile = obtainDriveListFile(downloadConfiguration, i);
             if (null == driveListResultFile) {
                 continue;
             }
-            String sysId = downloadConfiguration.getUrlParameterConfigs().get(i).getParameterSysId();
+            String sysId = urlParameterConfig.getParameterSysId();
 
             if (downloadConfiguration.getDriverSiteType() == DownloadConfiguration.DriverSiteType.Lenovo) {
 
                 // parse driver list file
                 LenovoDriverListResult lenovoDriverListResult = parseLenovoDriveListFromFile(driveListResultFile);
 
+                // re-config the base download folder
+                if (downloadConfiguration.getUseSameDateForEachUrlParameterConfig()) {
+                    baseDrivesFolder = new File(downloadConfiguration.getTargetBaseFolder(), downloadConfiguration.getRealDrivesFolderName());
+                }
+                File lenovoDriverListFolder = getDriverListFolder(baseDrivesFolder, lenovoDriverListResult, sysId);
+
                 // copy(save) driver list file
-                File lenovoDriverListFolder = getDriverListFolder(downloadConfiguration, lenovoDriverListResult, sysId);
+                logger.info("lenovoDriverListFolder = {}", lenovoDriverListFolder);
                 if (null != lenovoDriverListFolder &&
                         !StringUtils.equals(driveListResultFile.getParentFile().getAbsolutePath(), lenovoDriverListFolder.getAbsolutePath())) {
                     try {
@@ -69,7 +78,7 @@ public class DriveDownloadTask {
 
                 // download drivers
                 try {
-                    downloadDriveListByLenovoDriveListResult(downloadConfiguration, lenovoDriverListResult, sysId);
+                    downloadDriveListByLenovoDriveListResult(lenovoDriverListResult, lenovoDriverListFolder, downloadConfiguration.getRetryTimesWhenFail());
                 } catch (Exception e) {
                     logger.error("", e);
                 }
@@ -122,7 +131,7 @@ public class DriveDownloadTask {
             return null;
         }
 
-        if (downloadConfiguration.getUseDateAsSubFolder()) {
+        if (downloadConfiguration.getUseDateAsFolderPathSegment()) {
             downloadConfiguration.setDownloadDate(new Date());
         }
 
@@ -220,28 +229,21 @@ public class DriveDownloadTask {
         return subDirPathSb.toString();
     }
 
-    private static File getDriverListFolder(DownloadConfiguration downloadConfiguration, LenovoDriverListResult driveListResult, String sysId) {
+    private static File getDriverListFolder(File baseDrivesFolder, LenovoDriverListResult driveListResult, String sysId) {
         String subDirectoryPathForDriverListFile = getSubDirectoryPathForDriverListFile(driveListResult, sysId);
-        File drivesFolder = null == downloadConfiguration ? null :
-                new File(downloadConfiguration.getTargetBaseFolder(), downloadConfiguration.getRealDrivesFolderName());
         if (StringUtils.isBlank(subDirectoryPathForDriverListFile)) {
-            return drivesFolder;
+            return baseDrivesFolder;
         } else {
-            return new File(drivesFolder, subDirectoryPathForDriverListFile);
+            return new File(baseDrivesFolder, subDirectoryPathForDriverListFile);
         }
     }
 
 
     /**
-     * @param downloadConfiguration downloadConfiguration
-     * @param driveListResult       driveListResult
-     * @param sysId                 sysId
+     * @param driveListResult        driveListResult
+     * @param lenovoDriverListResult 驱动保持保存跟
      */
-    private static void downloadDriveListByLenovoDriveListResult(DownloadConfiguration downloadConfiguration, LenovoDriverListResult driveListResult, String sysId) {
-        if (null == downloadConfiguration) {
-            logger.warn("downloadConfiguration = null");
-            return;
-        }
+    private static void downloadDriveListByLenovoDriveListResult(LenovoDriverListResult driveListResult, File lenovoDriverListResult, int retryTimesWhenFail) {
 
         if (null == driveListResult) {
             logger.warn("parse DriveListResult failed, driveListResult = null");
@@ -253,13 +255,17 @@ public class DriveDownloadTask {
             logger.warn("data = null.");
             return;
         }
-        File driverListFolder = getDriverListFolder(downloadConfiguration, driveListResult, sysId);
         List<LenovoDriverListResult.DrivePart> partList = data.getPartList();
         if (CollectionUtils.isEmpty(partList)) {
             logger.warn("no available drives");
             return;
         }
-        for (LenovoDriverListResult.DrivePart drivePart : partList) {
+
+        List<LenovoDriverListResult.Drive> downloadFailedDrives = new ArrayList<>();
+
+        for (int i = 0; i < partList.size(); i++) {
+            LenovoDriverListResult.DrivePart drivePart = partList.get(i);
+            logger.info("will download index = {}/{}, driver info = {}", i + 1, partList.size(), drivePart);
             if (null == drivePart) {
                 continue;
             }
@@ -268,7 +274,7 @@ public class DriveDownloadTask {
                 continue;
             }
             partName = StringEscapeUtils.unescapeJava(partName);
-            File drivePartFolder = new File(driverListFolder, partName);
+            File drivePartFolder = new File(lenovoDriverListResult, partName);
             if (!drivePartFolder.isDirectory()) {
                 if (!drivePartFolder.mkdirs()) {
                     logger.warn("failed to make directory: {}", drivePartFolder);
@@ -280,8 +286,12 @@ public class DriveDownloadTask {
                 return;
             }
 
-            List<LenovoDriverListResult.Drive> downloadFailedDrives = new ArrayList<>();
-            for (LenovoDriverListResult.Drive drive : driveList) {
+            for (int j = 0; j < driveList.size(); j++) {
+                LenovoDriverListResult.Drive drive = driveList.get(j);
+                logger.info("will down driver {}/{} of {}/{}, name = {}, url = {}",
+                        j + 1, driveList.size(), i + 1, partList.size(),
+                        null == drive ? null : (drive.getDriverName() + File.separator + drive.getFileName()),
+                        null == drive ? null : drive.getFilePath());
                 if (null == drive) {
                     continue;
                 }
@@ -293,6 +303,8 @@ public class DriveDownloadTask {
                 if (!driveFolder.isDirectory()) {
                     if (!driveFolder.mkdirs()) {
                         logger.warn("failed to make directory: {}", driveFolder);
+                        downloadFailedDrives.add(drive);
+                        continue;
                     }
                 }
                 String filePath = drive.getFilePath();
@@ -338,16 +350,16 @@ public class DriveDownloadTask {
                             logger.error("failed to download driver, maybe the download url is illegal. path = {}, driver: {}", filePath, drive, e);
                             downloadFailedDrives.add(drive);
                             break;
-                        } else if (downloadConfiguration.getRetryTimesWhenFail() < 0) {
+                        } else if (retryTimesWhenFail < 0) {
                             logger.error("failed to download and retry to download driver: {}", drive, e);
                         } else {
-                            if (retryTime < downloadConfiguration.getRetryTimesWhenFail()) {
+                            if (retryTime < retryTimesWhenFail) {
                                 retryTime++;
                                 logger.error("failed to download and retry({}/{}) to download driver: {}",
-                                        retryTime, downloadConfiguration.getRetryTimesWhenFail(), drive, e);
+                                        retryTime, retryTimesWhenFail, drive, e);
                             } else {
                                 logger.error("failed to download and has up to max retry time {}/{}, so give up to download driver: {}",
-                                        retryTime, downloadConfiguration.getRetryTimesWhenFail(), drive, e);
+                                        retryTime, retryTimesWhenFail, drive, e);
                                 downloadFailedDrives.add(drive);
                                 break;
                             }
@@ -355,22 +367,19 @@ public class DriveDownloadTask {
                     }
                 }
             }
-
-            // report
-            logger.info("--------------------------------------------------------------------------------------------");
-            if (downloadFailedDrives.isEmpty()) {
-                logger.info("all drivers are downloaded successful.");
-            } else {
-                logger.warn("{} drivers are downloaded failed: {}", downloadFailedDrives.size(),
-                        downloadFailedDrives.stream().filter(Objects::nonNull)
-                                .map(drive -> drive.getDriverName() + ":" + drive.getVersion() + ":" + drive.getFilePath())
-                                .collect(Collectors.toList())
-                );
-            }
-            logger.info("--------------------------------------------------------------------------------------------");
         }
 
+        // report
+        logger.info("--------------------------------------------------------------------------------------------");
+        if (downloadFailedDrives.isEmpty()) {
+            logger.info("all drivers are downloaded successful.");
+        } else {
+            logger.warn("{} drivers are downloaded failed: {}", downloadFailedDrives.size(),
+                    downloadFailedDrives.stream().filter(Objects::nonNull)
+                            .map(drive -> drive.getDriverName() + ":" + drive.getVersion() + ":" + drive.getFilePath())
+                            .collect(Collectors.toList())
+            );
+        }
+        logger.info("--------------------------------------------------------------------------------------------");
     }
-
-
 }
