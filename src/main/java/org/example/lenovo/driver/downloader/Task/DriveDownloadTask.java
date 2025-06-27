@@ -1,12 +1,15 @@
 package org.example.lenovo.driver.downloader.Task;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.my.downloader.utils.DownloadUtils;
 import com.my.downloader.utils.MyFileUtils;
 import com.my.downloader.utils.MyUrlUtils;
+import com.my.ftl.template.FtlTemplateRenderFactory;
 import me.tongfei.progressbar.ProgressBar;
 import me.tongfei.progressbar.ProgressBarBuilder;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.example.lenovo.driver.downloader.config.DownloadConfiguration;
@@ -17,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -78,7 +82,7 @@ public class DriveDownloadTask {
 
                 // download drivers
                 try {
-                    downloadDriveListByLenovoDriveListResult(lenovoDriverListResult, lenovoDriverListFolder, downloadConfiguration.getRetryTimesWhenFail());
+                    downloadDriveListByLenovoDriveListResult(lenovoDriverListResult, downloadConfiguration.getDriverDetailUrlPathBaseForThinkpad(), lenovoDriverListFolder, downloadConfiguration.getRetryTimesWhenFail());
                 } catch (Exception e) {
                     logger.error("", e);
                 }
@@ -240,10 +244,11 @@ public class DriveDownloadTask {
 
 
     /**
-     * @param driveListResult        driveListResult
-     * @param lenovoDriverListResult 驱动保持保存跟
+     * @param driveListResult                    driveListResult
+     * @param driverDetailUrlPathBaseForThinkpad ThinkPad驱动详情显示页接口
+     * @param lenovoDriverListFolder             驱动保持保存跟
      */
-    private static void downloadDriveListByLenovoDriveListResult(LenovoDriverListResult driveListResult, File lenovoDriverListResult, int retryTimesWhenFail) {
+    private static void downloadDriveListByLenovoDriveListResult(LenovoDriverListResult driveListResult, String driverDetailUrlPathBaseForThinkpad, File lenovoDriverListFolder, int retryTimesWhenFail) {
 
         if (null == driveListResult) {
             logger.warn("parse DriveListResult failed, driveListResult = null");
@@ -274,7 +279,7 @@ public class DriveDownloadTask {
                 continue;
             }
             partName = StringEscapeUtils.unescapeJava(partName);
-            File drivePartFolder = new File(lenovoDriverListResult, partName);
+            File drivePartFolder = new File(lenovoDriverListFolder, partName);
             if (!drivePartFolder.isDirectory()) {
                 if (!drivePartFolder.mkdirs()) {
                     logger.warn("failed to make directory: {}", drivePartFolder);
@@ -314,6 +319,8 @@ public class DriveDownloadTask {
                     downloadFailedDrives.add(drive);
                     continue;
                 }
+
+                // 下载驱动 exe
                 int retryTime = 0;
                 while (true) {
                     try {
@@ -365,6 +372,23 @@ public class DriveDownloadTask {
                             }
                         }
                     }
+                }
+
+                // 下载 driver detail
+                if (StringUtils.isBlank(driverDetailUrlPathBaseForThinkpad)) {
+                    logger.warn("cannot download the description for {}, because the given url of driver detail is null.", drive.getDriverName());
+                }
+                String driverEdtionId = drive.getDriverEdtionId();
+                String driverDetailUrl = driverDetailUrlPathBaseForThinkpad + "?driverID=" + driverEdtionId;
+                try {
+                    File driverDetailFile = DownloadUtils.download(driverDetailUrl, driveFolder, null);
+                    File driverDetailRenderFile = new File(driveFolder, FtlTemplateRenderFactory.TemplateName.DRIVER_DETAIL);
+                    JSONObject driverDetailJson = JSON.parseObject(IOUtils.toString(new FileReader(driverDetailFile.getPath(), StandardCharsets.UTF_8)));
+                     FtlTemplateRenderFactory.MyBasicFtlTemplateRender render = FtlTemplateRenderFactory.getFtlTemplateRender(FtlTemplateRenderFactory.TemplatePath.DRIVER_DETAIL);
+                    boolean result = render.processToFile(driverDetailJson.getJSONObject("data").getJSONObject("Data"), driverDetailRenderFile.getPath());
+                    logger.info("render {}, result = {}", drive.getDriverName(), result);
+                } catch (IOException | URISyntaxException e) {
+                    logger.error("failed to download the driver description with url: {}", driverDetailUrl, e);
                 }
             }
         }

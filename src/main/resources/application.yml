@@ -8,6 +8,8 @@ com:
             driver-site-type: Lenovo
             # 驱动列表下载的基础url 适配：source-type: URL
             driver-list-new-url-path-base: https://newsupport.lenovo.com.cn/api/drive/drive_listnew
+            # ThinkPad中驱动详情的基础url 适配：source-type: URL
+            driver-detail-url-path-base-for-thinkpad: https://newsupport.lenovo.com.cn/api/drive/driver_detailnew
             # 驱动存放目录 适配：source-type: URL
             target-base-folder: target/drives
             # 驱动列表文件路径 适配：source-type: DriveListFile

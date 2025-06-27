@@ -25,6 +25,10 @@ public class DownloadConfiguration {
      */
     private String driverListNewUrlPathBase;
     /**
+     * ThinkPad 驱动和软件下载 驱动详细页的基础url
+     */
+    private String driverDetailUrlPathBaseForThinkpad;
+    /**
      * 下载目录跟目录
      */
     private String targetBaseFolder;

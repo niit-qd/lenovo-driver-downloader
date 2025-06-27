@@ -150,3 +150,136 @@ https://newthink.lenovo.com.cn/api/ThinkHome/ProductLine/SearchProductLine?searc
 由于可能有多个值，根据`product_line_name`或`product_line_alias`的值进行判断真正所需要的机型id即可。
 如果名称显示为unicode编码，自行转码即可。
 
+---
+
+驱动详情页（ThinkPad）
+1. api
+    ```shell
+    https://newsupport.lenovo.com.cn/api/drive/driver_detailnew?driverID=62483
+    ```
+
+2. 示例
+    ```json
+    {
+        "statusCode": 200,
+        "message": "success",
+        "data": {
+            "Data": {
+                "Driver": [
+                    {
+                        "DriverEdtionId": "62483",
+                        "DriverName": "Intel\u4e3b\u677f\u82af\u7247\u7ec4\u9a71\u52a8\u7a0b\u5e8f(Windows 8.1 64-bit\/7)",
+                        "DriverCode": "DRV201601190013",
+                        "DriverId": "5007",
+                        "PDriverEdtionId": "0",
+                        "EdtionTitle": "",
+                        "Status": "1",
+                        "Version": "10.1.1.45",
+                        "HisCount": "",
+                        "ActiveTime": "",
+                        "IsEnable": "1         ",
+                        "IsMachineCodeShow": "0",
+                        "HardwareId": "8086_1901,8086_9D23,8086_A110,8086_A112,8086_A114,8086_A11C,8086_A121,8086_A131,8086_A150",
+                        "InstallCode": "-s -norestart",
+                        "SystemBus": "\u7cfb\u7edf\u603b\u7ebf",
+                        "IsIssued": "",
+                        "DriverIssuedDateTime": "2020\/8\/27",
+                        "IsLastEdition": "1",
+                        "CreateBy": "\u8303\u73a5",
+                        "CreateTime": "2020\/9\/1",
+                        "UpdateBy": "",
+                        "UpdateTime": "2020\/9\/1",
+                        "ShowPositionId": "0",
+                        "Field3": "",
+                        "Field4": "",
+                        "Field1": "\/\/SetupChipset.exe",
+                        "Field2": "",
+                        "Remark": "",
+                        "ProductLineList": "120",
+                        "InstallOverTime": "9999",
+                        "ISDCH": "0",
+                        "FTypeId": "1",
+                        "CoreVersion": "10.1.1.45",
+                        "PLID": "007280",
+                        "PartID": "43",
+                        "TypeName": "\u4e3b\u677f",
+                        "FileName": "intelchip-r07ic03w.exe",
+                        "FileType": "exe",
+                        "FileSize": "4.81 MB",
+                        "FilePath": "https:\/\/newdriverdl.lenovo.com.cn\/newlenovo\/alldriversupload\/62483\/intelchip-r07ic03w.exe?token=tB1cks3YW3EUMN9aA91D4RJZf5K1Pw6N95xNMwEtyJvJjhyoJfdsChYCuOAwbXMQ",
+                        "DriverEdtionIdTheNew": "62483"
+                    }
+                ],
+                "History": [
+                    {
+                        "DriverEdtionId": "9471",
+                        "DriverName": "Intel\u4e3b\u677f\u82af\u7247\u7ec4\u9a71\u52a8\u7a0b\u5e8f(Windows 8.1 64-bit\/7)",
+                        "DriverCode": "DRV201601190013",
+                        "DriverId": "5007",
+                        "PDriverEdtionId": "0",
+                        "EdtionTitle": "Intel\u4e3b\u677f\u82af\u7247\u7ec4\u9a71\u52a8\u7a0b\u5e8f(Windows 8.1 64-bit\/7)",
+                        "Status": "1",
+                        "Version": "10.1.1.9",
+                        "PartID": "43",
+                        "HisCount": "0",
+                        "ActiveTime": "",
+                        "IsEnable": "1         ",
+                        "IsMachineCodeShow": "0",
+                        "HardwareId": "8086_1901,8086_9D23,8086_A110,8086_A112,8086_A114,8086_A11C,8086_A121,8086_A131,8086_A150",
+                        "InstallCode": "-s -norestart",
+                        "SystemBus": "\u7cfb\u7edf\u603b\u7ebf",
+                        "IsIssued": "10101",
+                        "DriverIssuedDateTime": "2016\/1\/19",
+                        "IsLastEdition": "0",
+                        "CreateBy": "\u5d14\u6653\u4eac",
+                        "CreateTime": "2019\/7\/26",
+                        "UpdateBy": "",
+                        "UpdateTime": "2019\/7\/26",
+                        "ShowPositionId": "0",
+                        "Field3": "",
+                        "Field4": "",
+                        "Field1": "\/\/SetupChipset.exe",
+                        "Field2": "",
+                        "Remark": "",
+                        "ProductLineList": "120",
+                        "InstallOverTime": "9999",
+                        "ISDCH": "0",
+                        "FTypeId": "1",
+                        "CoreVersion": "10.1.1.9",
+                        "PLID": "007280",
+                        "CreateByCode": "cuixj",
+                        "UpdateByCode": "cuixj",
+                        "FileName": "intelchip[r07ic02w].exe",
+                        "FileType": "exe",
+                        "FileSize": "2.93 MB",
+                        "FilePath": "https:\/\/driverdl.lenovo.com.cn\/think\/download\/driver\/10065\/intelchip[r07ic02w].exe?token=mMetAqgrQvO8-u3e5H1lk_s4giqv1yFj2AsQQkQ45KjXnT8umh6p1RxHAgTbaWxf",
+                        "hisUpdateTime": "2025\/3\/3"
+                    }
+                ],
+                "DriverDescribe": [
+                    {
+                        "FDriverEdtionId": "62483",
+                        "FDescriptionContent": "&lt;p&gt;&lt;font face=&#39;sans-serif&#39;&gt;&lt;span style=&#39;text-align: left; color: rgb(0, 0, 0); text-transform: none; text-indent: 0px; letter-spacing: normal; font-size: 12pt; font-style: normal; font-variant: normal; font-weight: 400; text-decoration: none; word-spacing: 0px; display: inline !important; white-space: normal; orphans: 2; float: none; -webkit-text-stroke-width: 0px; background-color: rgb(255, 255, 255);&#39;&gt;\u5b89\u88c5\u65b9\u6cd5:&lt;\/span&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;&lt;\/span&gt;&lt;\/font&gt;&lt;\/p&gt;&lt;ul style=&#39;LIST-STYLE-TYPE: none&#39;&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;&lt;\/span&gt;&lt;li fulltext=&#39;true&#39;&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;&lt;\/span&gt;&lt;div&gt;&lt;font face=&#39;sans-serif&#39;&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;\u4e0b\u8f7d\u5e76\u5b89\u88c5\uff08\u63a8\u8350\uff09\uff1a &lt;\/span&gt;&lt;br&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;1.\u4ee5\u7ba1\u7406\u5458\u7684\u8eab\u4efd\u767b\u5f55 Windows \u64cd\u4f5c\u7cfb\u7edf &lt;\/span&gt;&lt;br&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;2.\u5355\u51fb\u7acb\u5373\u4e0b\u8f7d\u6309\u94ae\uff0c\u5f53\u5f39\u51fa\u6587\u4ef6\u4e0b\u8f7d\u5bf9\u8bdd\u6846\u65f6\uff0c\u9009\u62e9\u201c\u4fdd\u5b58\u201d &lt;\/span&gt;&lt;br&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;3.\u4e0b\u8f7d\u9a71\u52a8\u7a0b\u5e8f\u5230\u60a8\u6307\u5b9a\u7684\u4f4d\u7f6e &lt;\/span&gt;&lt;br&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;4.\u53cc\u51fb\u8fd0\u884c\u5df2\u7ecf\u4e0b\u8f7d\u7684\u9a71\u52a8\u7a0b\u5e8f\u6587\u4ef6\uff0c\u6309\u5c4f\u5e55\u63d0\u793a\u64cd\u4f5c\u5373\u53ef &lt;\/span&gt;&lt;\/font&gt;&lt;\/div&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;&lt;\/span&gt;&lt;div&gt;&lt;font face=&#39;sans-serif&#39;&gt;&lt;br&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;\u76f4\u63a5\u5b89\u88c5\uff08\u4e0d\u63a8\u8350\uff09\uff1a &lt;\/span&gt;&lt;br&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;1.\u4ee5\u7ba1\u7406\u5458\u7684\u8eab\u4efd\u767b\u5f55 Windows \u64cd\u4f5c\u7cfb\u7edf &lt;\/span&gt;&lt;br&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;2.\u5355\u51fb\u7acb\u5373\u4e0b\u8f7d\u6309\u94ae\uff0c\u5f53\u5f39\u51fa\u6587\u4ef6\u4e0b\u8f7d\u5bf9\u8bdd\u6846\u65f6\uff0c\u9009\u62e9\u201c\u8fd0\u884c\u201d\u6309\u94ae &lt;\/span&gt;&lt;br&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;3.\u7cfb\u7edf\u5c06\u5f39\u51fa\u5b89\u5168\u8b66\u544a\uff0c\u9009\u62e9\u201c\u8fd0\u884c\u201d &lt;\/span&gt;&lt;br&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;4.\u6309\u5c4f\u5e55\u63d0\u793a\u64cd\u4f5c\u5373\u53ef\u3002 &amp;nbsp;&amp;nbsp;&lt;\/span&gt;&lt;\/font&gt;&lt;\/div&gt;&lt;\/li&gt;&lt;li fulltext=&#39;true&#39;&gt;&lt;div&gt;&lt;font face=&#39;sans-serif&#39;&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;&lt;br&gt;&lt;\/span&gt;&lt;\/font&gt;&lt;\/div&gt;&lt;\/li&gt;&lt;\/ul&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;&lt;\/span&gt;&lt;p&gt;&lt;\/p&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;&lt;\/span&gt;&lt;p&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;&lt;font face=&#39;sans-serif&#39;&gt;\u652f\u6301\u7cfb\u7edf: &lt;\/font&gt;&lt;\/span&gt;&lt;\/p&gt;&lt;ul style=&#39;LIST-STYLE-TYPE: none&#39;&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;&lt;\/span&gt;&lt;li fulltext=&#39;true&#39;&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;&lt;\/span&gt;&lt;div&gt;&lt;font face=&#39;sans-serif&#39;&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;Microsoft Windows 8.1&amp;nbsp; 64-bit&lt;\/span&gt;&lt;br&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;Microsoft Windows 7&amp;nbsp; 32-bit, 64-bit&lt;\/span&gt;&lt;\/font&gt;&lt;\/div&gt;&lt;\/li&gt;&lt;li fulltext=&#39;true&#39;&gt;&lt;div&gt;&lt;font face=&#39;sans-serif&#39;&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;&lt;br&gt;&lt;\/span&gt;&lt;\/font&gt;&lt;\/div&gt;&lt;\/li&gt;&lt;\/ul&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;&lt;\/span&gt;&lt;p&gt;&lt;\/p&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;&lt;\/span&gt;&lt;p&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;&lt;font face=&#39;sans-serif&#39;&gt;\u652f\u6301\u673a\u578b: &lt;\/font&gt;&lt;\/span&gt;&lt;\/p&gt;&lt;ul style=&#39;LIST-STYLE-TYPE: none&#39;&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;&lt;\/span&gt;&lt;li fulltext=&#39;true&#39;&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;&lt;\/span&gt;&lt;div&gt;&lt;font face=&#39;sans-serif&#39;&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;ThinkPad L460&lt;\/span&gt;&lt;br&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;ThinkPad T460p&lt;\/span&gt;&lt;\/font&gt;&lt;\/div&gt;&lt;\/li&gt;&lt;li fulltext=&#39;true&#39;&gt;&lt;div&gt;&lt;font face=&#39;sans-serif&#39;&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;&lt;br&gt;&lt;\/span&gt;&lt;\/font&gt;&lt;\/div&gt;&lt;\/li&gt;&lt;\/ul&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;&lt;\/span&gt;&lt;p&gt;&lt;\/p&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;&lt;\/span&gt;&lt;p&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;&lt;font face=&#39;sans-serif&#39;&gt;\u652f\u6301\u90e8\u4ef6: &lt;\/font&gt;&lt;\/span&gt;&lt;\/p&gt;&lt;ul style=&#39;LIST-STYLE-TYPE: none&#39;&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;&lt;\/span&gt;&lt;li fulltext=&#39;true&#39;&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;&lt;\/span&gt;&lt;div&gt;&lt;font face=&#39;sans-serif&#39;&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;Intel(R) 8 Series Chipsets &lt;\/span&gt;&lt;br&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;Intel(R) 9 series chipset&lt;\/span&gt;&lt;br&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;Intel(R) Core(R) M processor family&lt;\/span&gt;&lt;br&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;6th Generation Intel(R) Core(TM) processor family&lt;\/span&gt;&lt;br&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;5th Generation Intel(R) Core(TM) processor family&lt;\/span&gt;&lt;br&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;4th Generation Intel(R) Core(TM) processor family&lt;\/span&gt;&lt;br&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;3rd Generation Intel(R) Core(TM) processor family&lt;\/span&gt;&lt;br&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;2nd Generation Intel(R) Core(TM) processor family&lt;\/span&gt;&lt;br&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;IntelR Atom\/CeleronR\/PentiumR Processor&lt;\/span&gt;&lt;br&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;Wellsburg&lt;\/span&gt;&lt;br&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;Patsburg&lt;\/span&gt;&lt;\/font&gt;&lt;\/div&gt;&lt;\/li&gt;&lt;li fulltext=&#39;true&#39;&gt;&lt;div&gt;&lt;font face=&#39;sans-serif&#39;&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;&lt;br&gt;&lt;\/span&gt;&lt;\/font&gt;&lt;\/div&gt;&lt;\/li&gt;&lt;\/ul&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;&lt;\/span&gt;&lt;p&gt;&lt;\/p&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;&lt;\/span&gt;&lt;p&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;&lt;font face=&#39;sans-serif&#39;&gt;\u66f4\u65b0\u8bf4\u660e: &lt;\/font&gt;&lt;\/span&gt;&lt;\/p&gt;&lt;ul style=&#39;LIST-STYLE-TYPE: none&#39;&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;&lt;\/span&gt;&lt;li fulltext=&#39;true&#39;&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;&lt;\/span&gt;&lt;div&gt;&lt;font face=&#39;sans-serif&#39;&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;R07IC03W &amp;lt;10.1.1.45&amp;gt;&lt;\/span&gt;&lt;br&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;&lt;span style=&#39;color: rgb(0, 0, 0); font-family: sans-serif; font-size: 12pt; font-style: normal; font-variant: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: left; text-decoration: none; text-indent: 0px; text-transform: none; -webkit-text-stroke-width: 0px; white-space: normal; word-spacing: 0px;&#39;&gt;- [\u91cd\u8981] \u89e3\u51b3\u5b89\u5168\u6f0f\u6d1e\u95ee\u9898&amp;nbsp;CVE-2019-6173 \u548c CVE-2019-6196&lt;br&gt;- (\u4fee\u6b63) \u8106\u5f31\u6027\u95ee\u9898: CVE-2019-0128 &lt;\/span&gt;&lt;br style=&#39;color: rgb(0, 0, 0); font-family: sans-serif; font-size: 12px; font-style: normal; font-variant: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: left; text-decoration: none; text-indent: 0px; text-transform: none; -webkit-text-stroke-width: 0px; white-space: normal; word-spacing: 0px;&#39;&gt;&lt;span style=&#39;color: rgb(0, 0, 0); font-family: sans-serif; font-size: 12pt; font-style: normal; font-variant: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: left; text-decoration: none; text-indent: 0px; text-transform: none; -webkit-text-stroke-width: 0px; white-space: normal; word-spacing: 0px;&#39;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; \u5b89\u88c5\u7a0b\u5e8f\u5728\u82f1\u7279\u5c14(R)\u82af\u7247\u7ec4\u8bbe\u5907\u8f6f\u4ef6(INF\u66f4\u65b0\u5b9e\u7528\u7a0b\u5e8f)\u4e4b\u524d\u7684\u4e0d\u5f53\u6743\u9650&lt;\/span&gt;&lt;\/span&gt;&lt;br&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;&amp;lt;10.1.1.9&amp;gt;(R07IC02W)&lt;\/span&gt;&lt;br&gt;&lt;span style=&#39;font-size: 12pt;&#39;&gt;- (\u65b0\u589e) \u65b0\u53d1\u5e03\u652f\u6301ThinkPad L460, T460p.&lt;\/span&gt;&lt;\/font&gt;&lt;\/div&gt;&lt;\/li&gt;&lt;\/ul&gt;",
+                        "FCreator": "",
+                        "FCreateDateTime": "2019\/9\/6",
+                        "FTimestamp": "System.Byte[]",
+                        "FSourcePath": ""
+                    }
+                ],
+                "OS": [
+                    {
+                        "Name": "Windows 7 32-bit"
+                    },
+                    {
+                        "Name": "Windows 7 64-bit"
+                    },
+                    {
+                        "Name": "Windows 8.1 64-bit"
+                    }
+                ]
+            },
+            "StatusCode": "200",
+            "Message": "\u6210\u529f"
+        }
+    }
+    ```
