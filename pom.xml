@@ -10,12 +10,13 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
-        <version>2.5.12</version>
+        <version>3.5.8</version>
     </parent>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
+        <java.version>17</java.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -50,19 +51,19 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.12.0</version>
+            <version>3.18.0</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.11.0</version>
+            <version>2.14.0</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-text</artifactId>
-            <version>1.9</version>
+            <version>1.10.0</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
@@ -76,7 +77,7 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>1.2.76</version>
+            <version>1.2.83</version>
         </dependency>
 
         <dependency>
@@ -94,7 +95,7 @@
         <dependency>
             <groupId>me.tongfei</groupId>
             <artifactId>progressbar</artifactId>
-            <version>0.9.0</version>
+            <version>0.10.1</version>
             <!-- 0.9.0：Java 8已经不再支持，可以使用Java 17 -->
         </dependency>
     </dependencies>
@@ -106,7 +107,7 @@
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
-                    <version>2.5.12</version>
+                    <version>3.5.8</version>
                 </plugin>
             </plugins>
         </pluginManagement>
