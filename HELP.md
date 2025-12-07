@@ -10,6 +10,10 @@ For further reference, please consider the following sections:
 
 ---
 
+JDK: 17
+
+---
+
 1. Maven 设置utf8编码格式 方法
    [Maven 设置utf8编码格式 方法](https://blog.csdn.net/laow1314/article/details/108759701)
    [Maven 设置utf8编码格式 方法](https://codeleading.com/article/14374739596/)
