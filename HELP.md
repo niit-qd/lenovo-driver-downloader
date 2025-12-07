@@ -19,7 +19,42 @@ If you manually switch to a different parent and actually want the inheritance, 
 
 ---
 
+### JDK版本
 JDK: 17
+
+### 
+
+问题：
+``` shell
+mvn clean package
+...
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.14.1:compile (default-compile) on project lenovo-driver-downloader: Fatal error compiling: 无效的目标发行版: 17 -> [Help 1]
+```
+解决方案：
+手动配置`JAVA_HOME`，注意，不要直接执行`JAVA_HOME=xxx`，需要添加`export`才可以。
+实例：
+```shell
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-17.0.16.8-2.oe2509.x86_64
+```
+原因和mvn绑定的JAVA版本有关。
+执行上述命令之前：
+```shell
+[hw@192 ~]$ mvn -v
+Apache Maven 3.6.3 (openEuler 3.6.3-2)
+Maven home: /usr/share/maven
+Java version: 1.8.0_462, vendor: BiSheng, runtime: /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.462.b08-3.oe2509.x86_64/jre
+Default locale: zh_CN, platform encoding: UTF-8
+OS name: "linux", version: "6.6.0-102.0.0.8.oe2509.x86_64", arch: "amd64", family: "unix"
+```
+执行上述命令之后：
+```shell
+[hw@192 ~]$ mvn -v
+Apache Maven 3.6.3 (openEuler 3.6.3-2)
+Maven home: /usr/share/maven
+Java version: 17.0.16, vendor: BiSheng, runtime: /usr/lib/jvm/java-17-openjdk-17.0.16.8-2.oe2509.x86_64
+Default locale: zh_CN, platform encoding: UTF-8
+OS name: "linux", version: "6.6.0-102.0.0.8.oe2509.x86_64", arch: "amd64", family: "unix"
+```
 
 ---
 
