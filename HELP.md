@@ -200,3 +200,4 @@ SpringBoot中导致此文的提交是：[Commit fb078a7](https://github.com/spri
     </build>
 ```
 该问题，已经提交相关issue进行咨询：[48409](https://github.com/spring-projects/spring-boot/issues/48409)
+一天后，删除旧的jar文件`.m2\repository\org\apache\maven\plugins\maven-surefire-plugin\3.5.4`后，重新下载，问题不在复现。
