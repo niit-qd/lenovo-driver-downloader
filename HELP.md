@@ -20,6 +20,7 @@ If you manually switch to a different parent and actually want the inheritance, 
 ---
 
 ### JDK版本
+
 JDK: 17
 
 ---
@@ -102,24 +103,27 @@ JDK: 17
    [chcp](https://learn.microsoft.com/zh-cn/windows-server/administration/windows-commands/chcp)
    [CHCP](https://ss64.com/nt/chcp.html)
 
-
-
-### 
+###   
 
 问题：
+
 ``` shell
 mvn clean package
 ...
 [ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.14.1:compile (default-compile) on project lenovo-driver-downloader: Fatal error compiling: 无效的目标发行版: 17 -> [Help 1]
 ```
+
 解决方案：
 手动配置`JAVA_HOME`，注意，不要直接执行`JAVA_HOME=xxx`，需要添加`export`才可以。
 实例：
+
 ```shell
 export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-17.0.16.8-2.oe2509.x86_64
 ```
+
 原因和mvn绑定的JAVA版本有关。
 执行上述命令之前：
+
 ```shell
 [hw@192 ~]$ mvn -v
 Apache Maven 3.6.3 (openEuler 3.6.3-2)
@@ -128,7 +132,9 @@ Java version: 1.8.0_462, vendor: BiSheng, runtime: /usr/lib/jvm/java-1.8.0-openj
 Default locale: zh_CN, platform encoding: UTF-8
 OS name: "linux", version: "6.6.0-102.0.0.8.oe2509.x86_64", arch: "amd64", family: "unix"
 ```
+
 执行上述命令之后：
+
 ```shell
 [hw@192 ~]$ mvn -v
 Apache Maven 3.6.3 (openEuler 3.6.3-2)
@@ -178,13 +184,17 @@ mvn clean package
 [ERROR] For more information about the errors and possible solutions, please read the following articles:
 [ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/PluginContainerException
 ```
+
 解决方法：
 升级到`4.0.0`之后，用到的`maven-surefire-plugin`的版本是`3.5.4`:
+
 ```xml
     <maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
 ```
+
 SpringBoot中导致此文的提交是：[Commit fb078a7](https://github.com/spring-projects/spring-boot/commit/fb078a7b6e623a638acfe6dfd87882b4c6532617#diff-628b1be6256995e7b2c8ca015447f7e3a3569350274a5accc528a37330ecbdb6R1498)
 临时方案，使用较低版本替换：`3.5.3`
+
 ```xml
     <build>
         <pluginManagement>
@@ -199,5 +209,6 @@ SpringBoot中导致此文的提交是：[Commit fb078a7](https://github.com/spri
         </pluginManagement>
     </build>
 ```
+
 该问题，已经提交相关issue进行咨询：[48409](https://github.com/spring-projects/spring-boot/issues/48409)
 一天后，删除旧的jar文件`.m2\repository\org\apache\maven\plugins\maven-surefire-plugin\3.5.4`后，重新下载，问题不在复现。

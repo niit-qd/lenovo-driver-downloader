@@ -2,12 +2,12 @@ package com.my.downloader.utils;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,56 +89,57 @@ public class DownloadUtils {
      */
     public static String getFileNameFromUrl(String url, String defaultFileName, boolean getFileNameFromUrl) {
         String filename = null;
-        CloseableHttpClient httpclient = HttpClients.createDefault();
-        try {
-            HttpGet httpget = new HttpGet(url);
-            System.out.println("Executing request " + httpget.getRequestLine());
-            try (CloseableHttpResponse response = httpclient.execute(httpget)) {
-                // guess the file name
-                if (getFileNameFromUrl) {
-                    Header contentDispositionHeader = response.getFirstHeader("Content-Disposition");
-                    if (null != contentDispositionHeader) {
-                        String dispositionValue = contentDispositionHeader.getValue();
-                        String[] parts = dispositionValue.split(";");
-                        for (String part : parts) {
-                            if (StringUtils.isBlank(part)) {
-                                continue;
-                            }
-                            part = part.trim();
-                            int index = part.indexOf("filename=");
-                            if (index > 0) {
-                                filename = dispositionValue.substring(index + 10, dispositionValue.length() - 1);
-                                logger.trace("从url请求中解析到文件名：{}", filename);
-                                break;
-                            }
-                        }
-                    }
-                    if (null == filename) {
-                        int index = url.indexOf("?");
-                        if (-1 == index) {
-                            filename = url.substring(url.lastIndexOf("/") + 1);
-                        } else {
-                            filename = url.substring(url.lastIndexOf("/") + 1, index);
-                        }
-                        logger.trace("从url中解析到文件名：{}", filename);
-                    }
-                }
-                if (null == filename) {
-                    filename = defaultFileName;
-                    logger.info("使用默认文件名：{}", filename);
-                }
-            }
-        } catch (IOException e) {
-            logger.error(null, e);
-        } finally {
+        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
             try {
-                httpclient.close();
+                HttpGet httpGet = new HttpGet(url);
+                logger.debug("request method: {}, uri: {}, version: {}", httpGet.getMethod(), httpGet.getRequestUri(), httpGet.getVersion());
+
+                filename = httpclient.execute(httpGet, response -> getString(url, defaultFileName, getFileNameFromUrl, response));
             } catch (IOException e) {
                 logger.error(null, e);
             }
+        } catch (IOException e) {
+            logger.error(null, e);
         }
 
         return filename;
+    }
+
+    private static String getString(String url, String defaultFileName, boolean getFileNameFromUrl, HttpResponse response) {
+        String fileName = null;
+        if (getFileNameFromUrl) {
+            Header contentDispositionHeader = response.getFirstHeader("Content-Disposition");
+            if (null != contentDispositionHeader) {
+                String dispositionValue = contentDispositionHeader.getValue();
+                String[] parts = dispositionValue.split(";");
+                for (String part : parts) {
+                    if (StringUtils.isBlank(part)) {
+                        continue;
+                    }
+                    part = part.trim();
+                    int index = part.indexOf("filename=");
+                    if (index > 0) {
+                        fileName = dispositionValue.substring(index + 10, dispositionValue.length() - 1);
+                        logger.trace("从url请求中解析到文件名：{}", fileName);
+                        break;
+                    }
+                }
+            }
+            if (null == fileName) {
+                int index = url.indexOf("?");
+                if (-1 == index) {
+                    fileName = url.substring(url.lastIndexOf("/") + 1);
+                } else {
+                    fileName = url.substring(url.lastIndexOf("/") + 1, index);
+                }
+                logger.trace("从url中解析到文件名：{}", fileName);
+            }
+        }
+        if (null == fileName) {
+            fileName = defaultFileName;
+            logger.info("使用默认文件名：{}", fileName);
+        }
+        return fileName;
     }
 
     /**
@@ -150,129 +151,100 @@ public class DownloadUtils {
      * @param getFileNameFromUrl 是否从url请求中解析文件名
      * @param callback           下载进度回调
      * @return 下载好的文件
-     * @throws IOException 可能的异常
      */
-    public static File download(String url, File targetFolder, String defaultFileName, boolean getFileNameFromUrl, DownloadProgressCallback callback) throws IOException, URISyntaxException {
+    public static File download(String url, File targetFolder, String defaultFileName, boolean getFileNameFromUrl, DownloadProgressCallback callback) {
         if (!targetFolder.exists()) {
             if (!targetFolder.mkdirs()) {
                 return null;
             }
         }
-        File targetFile = null;
-        OutputStream os = null;
-        CloseableHttpClient httpclient = HttpClients.createDefault();
-        try {
+        try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
             URL url1 = new URL(url);
             URI uri = new URI(url1.getProtocol(), url1.getUserInfo(), url1.getHost(), url1.getPort(), url1.getPath(), url1.getQuery(), null);
-            HttpGet httpget = new HttpGet(uri);
-            System.out.println("Executing request " + httpget.getRequestLine());
-            CloseableHttpResponse response = httpclient.execute(httpget);
-            try {
-                logger.info("----------------------------------------");
-                logger.info("{}", response.getStatusLine());
+            HttpGet httpGet = new HttpGet(uri);
+            logger.debug("request method: {}", httpGet.getMethod());
+            logger.debug("request uri: {}", httpGet.getRequestUri());
+            logger.debug("version: {}", httpGet.getVersion());
+            return httpclient.execute(httpGet, response -> {
+                File targetFile = null;
+                OutputStream os = null;
+                try {
+                    logger.info("----------------------------------------");
+                    logger.debug("request method: {}, uri: {}, version: {}", httpGet.getMethod(), httpGet.getRequestUri(), httpGet.getVersion());
 
-                // Get hold of the response entity
-                HttpEntity entity = response.getEntity();
+                    // Get hold of the response entity
+                    HttpEntity entity = response.getEntity();
 
-                // guess the file name
-                String filename = null;
-                if (getFileNameFromUrl) {
-                    Header contentDispositionHeader = response.getFirstHeader("Content-Disposition");
-                    if (null != contentDispositionHeader) {
-                        String dispositionValue = contentDispositionHeader.getValue();
-                        String[] parts = dispositionValue.split(";");
-                        for (String part : parts) {
-                            if (StringUtils.isBlank(part)) {
-                                continue;
-                            }
-                            part = part.trim();
-                            int index = part.indexOf("filename=");
-                            if (index > 0) {
-                                filename = dispositionValue.substring(index + 10, dispositionValue.length() - 1);
-                                logger.trace("从url请求中解析到文件名：{}", filename);
-                                break;
-                            }
-                        }
-                    }
-                    if (null == filename) {
-                        int index = url.indexOf("?");
-                        if (-1 == index) {
-                            filename = url.substring(url.lastIndexOf("/") + 1);
-                        } else {
-                            filename = url.substring(url.lastIndexOf("/") + 1, index);
-                        }
-                        logger.trace("从url中解析到文件名：{}", filename);
-                    }
-                }
-                if (null == filename) {
-                    filename = defaultFileName;
-                    logger.info("使用默认文件名：{}", filename);
-                }
+                    // guess the file name
+                    String filename;
+                    filename = getString(url, defaultFileName, getFileNameFromUrl, response);
 
 
-                // If the response does not enclose an entity, there is no need
-                // to bother about connection release
-                if (entity != null) {
-                    // TODO： 注意：获取的长度与实际文件大小不一致
-                    long contentLength = entity.getContentLength();
-                    if (null != callback) {
-                        callback.onDownloadStarted(url, targetFolder, defaultFileName, getFileNameFromUrl, contentLength);
-                    }
-                    long count = 0;
-                    InputStream inStream = null;
-                    try {
-                        inStream = entity.getContent();
-                        // inStream.read();
-                        // do something useful with the response
-                        targetFile = new File(targetFolder, filename);
-                        os = Files.newOutputStream(targetFile.toPath());
-                        // IOUtils.copy(inStream, os);
-                        int n;
-                        byte[] buffer = IOUtils.byteArray(IOUtils.DEFAULT_BUFFER_SIZE);
-                        while (IOUtils.EOF != (n = inStream.read(buffer))) {
-                            os.write(buffer, 0, n);
-                            count += n;
-                            if (null != callback) {
-                                callback.onDownloadProgressChanged(url, targetFolder, defaultFileName, getFileNameFromUrl, count, contentLength);
-                            }
-                        }
+                    // If the response does not enclose an entity, there is no need
+                    // to bother about connection release
+                    if (entity != null) {
+                        // TODO： 注意：获取的长度与实际文件大小不一致
+                        long contentLength = entity.getContentLength();
                         if (null != callback) {
-                            callback.onDownloadCompleted(url, targetFolder, defaultFileName, getFileNameFromUrl, count, contentLength, DownloadProgressCallback.RESULT_SUCCESSFUL, null);
+                            callback.onDownloadStarted(url, targetFolder, defaultFileName, getFileNameFromUrl, contentLength);
                         }
-                        logger.info("download success. url = {}, location = {}", url, targetFile);
-                    } catch (IOException ex) {
-                        // In case of an IOException the connection will be released
-                        // back to the connection manager automatically
-                        if (null != callback) {
-                            callback.onDownloadCompleted(url, targetFolder, defaultFileName, getFileNameFromUrl, count, contentLength, DownloadProgressCallback.RESULT_FAILED_DOWNLOAD_EXCEPTION, ex);
-                        }
-                        throw ex;
-                    } finally {
-                        // Closing the input stream will trigger connection release
+                        long count = 0;
+                        InputStream inStream = null;
                         try {
-                            if (null != inStream) {
-                                inStream.close();
+                            inStream = entity.getContent();
+                            // inStream.read();
+                            // do something useful with the response
+                            targetFile = new File(targetFolder, filename);
+                            os = Files.newOutputStream(targetFile.toPath());
+                            // IOUtils.copy(inStream, os);
+                            int n;
+                            byte[] buffer = IOUtils.byteArray(IOUtils.DEFAULT_BUFFER_SIZE);
+                            while (IOUtils.EOF != (n = inStream.read(buffer))) {
+                                os.write(buffer, 0, n);
+                                count += n;
+                                if (null != callback) {
+                                    callback.onDownloadProgressChanged(url, targetFolder, defaultFileName, getFileNameFromUrl, count, contentLength);
+                                }
                             }
-                            if (null != os) {
-                                os.close();
-                            }
-                        } catch (Exception e) {
                             if (null != callback) {
-                                callback.onDownloadCompleted(url, targetFolder, defaultFileName, getFileNameFromUrl, count, contentLength, DownloadProgressCallback.RESULT_FAILED_OTHER_EXCEPTION, e);
+                                callback.onDownloadCompleted(url, targetFolder, defaultFileName, getFileNameFromUrl, count, contentLength, DownloadProgressCallback.RESULT_SUCCESSFUL, null);
                             }
-                            throw e;
+                            logger.info("download success. url = {}, location = {}", url, targetFile);
+                        } catch (IOException ex) {
+                            // In case of an IOException the connection will be released
+                            // back to the connection manager automatically
+                            if (null != callback) {
+                                callback.onDownloadCompleted(url, targetFolder, defaultFileName, getFileNameFromUrl, count, contentLength, DownloadProgressCallback.RESULT_FAILED_DOWNLOAD_EXCEPTION, ex);
+                            }
+                            throw ex;
+                        } finally {
+                            // Closing the input stream will trigger connection release
+                            try {
+                                if (null != inStream) {
+                                    inStream.close();
+                                }
+                                if (null != os) {
+                                    os.close();
+                                }
+                            } catch (Exception e) {
+                                if (null != callback) {
+                                    callback.onDownloadCompleted(url, targetFolder, defaultFileName, getFileNameFromUrl, count, contentLength, DownloadProgressCallback.RESULT_FAILED_OTHER_EXCEPTION, e);
+                                }
+                                throw e;
+                            }
                         }
                     }
+                } finally {
+                    response.close();
+                    if (null != os) {
+                        os.close();
+                    }
                 }
-            } finally {
-                response.close();
-                if (null != os) {
-                    os.close();
-                }
-            }
-        } finally {
-            httpclient.close();
+                return targetFile;
+            });
+        } catch (Exception e) {
+            logger.error("catch exception: {}", e.getMessage(), e);
+            return null;
         }
-        return targetFile;
     }
 }

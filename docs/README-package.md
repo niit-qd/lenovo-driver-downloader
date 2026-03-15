@@ -41,6 +41,7 @@
                     </executions>
                 </plugin>
             </plugins>
+        </build>
     ```
 2. 添加依赖配置
    添加`<pluginManagement>`。
@@ -69,11 +70,13 @@
                         </executions>
                     </plugin>
                 </plugins>
+            </build>
     ```
 3. 通过直接继承父项目
    父项目可选：`spring-boot-dependencies`或`spring-boot-starter-parent`。
    查看`spring-boot-dependencies`的pom文件可知，在其文件中已经定义了所有相关plugin的版本信息。
-   *注意：直接通过[Using Spring Boot without the Parent POM](`https://docs.spring.io/spring-boot/docs/2.5.12/maven-plugin/reference/htmlsingle/ #using.import`)
+   *注意：直接通过[Using Spring Boot without the Parent POM](
+   `https://docs.spring.io/spring-boot/docs/2.5.12/maven-plugin/reference/htmlsingle/ #using.import`)
    的方式是行不通的。可能的原因是，这种方式只是引入了依赖，而不是插件。*
     ```xml
     <dependencyManagement>

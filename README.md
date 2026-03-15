@@ -1,3 +1,8 @@
+[TOC]
+
+
+---
+
 # lenovo-driver-downloader
 
 用途，快速省心下载Lenovo&ThinkPad驱动。
@@ -155,6 +160,7 @@ https://newthink.lenovo.com.cn/api/ThinkHome/ProductLine/SearchProductLine?searc
 ---
 
 驱动详情页（ThinkPad）
+
 1. api
     ```shell
     https://newsupport.lenovo.com.cn/api/drive/driver_detailnew?driverID=62483
@@ -289,8 +295,10 @@ https://newthink.lenovo.com.cn/api/ThinkHome/ProductLine/SearchProductLine?searc
 ### Maven版本问题
 
 1. `Spring Boot` 版本
-    [System Requirements](https://docs.spring.io/spring-boot/system-requirements.html)
-    > Spring Boot 4.0.3 requires at least [Java 17](https://www.java.com/) and is compatible with versions up to and including Java 25. [Spring Framework 7.0.5](https://docs.spring.io/spring-framework/reference/7.0/) or above is also required.
+   [System Requirements](https://docs.spring.io/spring-boot/system-requirements.html)
+   > Spring Boot 4.0.3 requires at least [Java 17](https://www.java.com/) and is compatible with versions up to and
+   including Java 25. [Spring Framework 7.0.5](https://docs.spring.io/spring-framework/reference/7.0/) or above is also
+   required.
 
 2. `maven-compiler-plugin` 版本
     - 问题：
@@ -301,3 +309,48 @@ https://newthink.lenovo.com.cn/api/ThinkHome/ProductLine/SearchProductLine?searc
       配置的JDK版本过高：21。
     - 方案
       配置JDK版本为：17、18、19、20。
+
+3. `httpclient5`库
+    [Apache HttpComponents](https://hc.apache.org/index.html)
+    #### HttpComponents Structure
+    ##### HttpComponents Core
+    `HttpCore`[https://hc.apache.org/httpcomponents-core-ga/] is a set of low level HTTP transport components that can be used to build custom client and server side HTTP services with a minimal footprint. HttpCore supports two I/O models: blocking I/O model based on the classic Java I/O and non-blocking, event driven I/O model based on Java NIO.
+    HttpCore 是一组底层 HTTP 传输组件，可用于构建占用资源极少的自定义客户端和服务端 HTTP 服务。HttpCore 支持两种 I/O 模型：基于经典 Java I/O 的阻塞式 I/O 模型和基于 Java NIO 的非阻塞事件驱动型 I/O 模型。
+    ##### HttpComponents Client
+    `HttpClient`[https://hc.apache.org/httpcomponents-client-ga/] is a HTTP/1.1 compliant HTTP agent implementation based on HttpCore. It also provides reusable components for client-side authentication, HTTP state management, and HTTP connection management. HttpComponents Client is a successor of and replacement for `Commons HttpClient 3.x`[https://hc.apache.org/httpclient-legacy/index.html]. Users of Commons HttpClient are strongly encouraged to upgrade.
+    - 版本管理
+      ``` xml
+      <dependencyManagement>
+          <dependencies>
+              <dependency>
+                  <groupId>org.apache.httpcomponents.client5</groupId>
+                  <artifactId>httpclient5-parent</artifactId>
+                  <version>5.6</version>
+              </dependency>
+          </dependencies>
+      </dependencyManagement>
+      ```
+    - 必须
+      - `httpclient5` 必选
+        ``` xml
+        <dependency>
+            <groupId>org.apache.httpcomponents.core5</groupId>
+            <artifactId>httpcore5</artifactId>
+        </dependency>
+        ```
+      - `httpcore5` 至少必选其一
+        ``` xml
+        <dependency>
+            <groupId>org.apache.httpcomponents.core5</groupId>
+            <artifactId>httpcore5</artifactId>
+        </dependency>
+                <dependency>
+            <groupId>org.apache.httpcomponents.core5</groupId>
+            <artifactId>httpcore5-h2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents.core5</groupId>
+            <artifactId>httpcore5-reactive</artifactId>
+        </dependency>
+        ```
+    - 可选

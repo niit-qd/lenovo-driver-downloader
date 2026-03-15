@@ -11,6 +11,7 @@ import me.tongfei.progressbar.ProgressBarBuilder;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.text.StringEscapeUtils;
 import org.example.lenovo.driver.downloader.config.DownloadConfiguration;
 import org.example.lenovo.driver.downloader.model.LenovoDriverListResult;
@@ -72,7 +73,7 @@ public class DriveDownloadTask {
                 // copy(save) driver list file
                 logger.info("lenovoDriverListFolder = {}", lenovoDriverListFolder);
                 if (null != lenovoDriverListFolder &&
-                        !StringUtils.equals(driveListResultFile.getParentFile().getAbsolutePath(), lenovoDriverListFolder.getAbsolutePath())) {
+                        !Strings.CS.equals(driveListResultFile.getParentFile().getAbsolutePath(), lenovoDriverListFolder.getAbsolutePath())) {
                     try {
                         FileUtils.copyFileToDirectory(driveListResultFile, lenovoDriverListFolder);
                     } catch (IOException e) {
@@ -219,7 +220,7 @@ public class DriveDownloadTask {
                         continue;
                     }
                     String osId = os.getOSID();
-                    if (StringUtils.equals(sysId, osId)) {
+                    if (Strings.CS.equals(sysId, osId)) {
                         osName = os.getOSName();
                     }
                 }
@@ -384,7 +385,7 @@ public class DriveDownloadTask {
                     File driverDetailFile = DownloadUtils.download(driverDetailUrl, driveFolder, null);
                     File driverDetailRenderFile = new File(driveFolder, FtlTemplateRenderFactory.TemplateName.DRIVER_DETAIL);
                     JSONObject driverDetailJson = JSON.parseObject(IOUtils.toString(new FileReader(driverDetailFile.getPath(), StandardCharsets.UTF_8)));
-                     FtlTemplateRenderFactory.MyBasicFtlTemplateRender render = FtlTemplateRenderFactory.getFtlTemplateRender(FtlTemplateRenderFactory.TemplatePath.DRIVER_DETAIL);
+                    FtlTemplateRenderFactory.MyBasicFtlTemplateRender render = FtlTemplateRenderFactory.getFtlTemplateRender(FtlTemplateRenderFactory.TemplatePath.DRIVER_DETAIL);
                     boolean result = render.processToFile(driverDetailJson.getJSONObject("data").getJSONObject("Data"), driverDetailRenderFile.getPath());
                     logger.info("render {}, result = {}", drive.getDriverName(), result);
                 } catch (IOException | URISyntaxException e) {
