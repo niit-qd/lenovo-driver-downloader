@@ -285,3 +285,19 @@ https://newthink.lenovo.com.cn/api/ThinkHome/ProductLine/SearchProductLine?searc
         }
     }
     ```
+
+### Maven版本问题
+
+1. `Spring Boot` 版本
+    [System Requirements](https://docs.spring.io/spring-boot/system-requirements.html)
+    > Spring Boot 4.0.3 requires at least [Java 17](https://www.java.com/) and is compatible with versions up to and including Java 25. [Spring Framework 7.0.5](https://docs.spring.io/spring-framework/reference/7.0/) or above is also required.
+
+2. `maven-compiler-plugin` 版本
+    - 问题：
+      ```log
+      [ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.14.1:compile (default-compile) on project lenovo-driver-downloader: Fatal error compiling: java.lang.NoSuchFieldError: Class com.sun.tools.javac.tree.JCTree$JCImport does not have member field 'com.sun.tools.javac.tree.JCTree qualid' -> [Help 1]
+      ```
+    - 原因
+      配置的JDK版本过高：21。
+    - 方案
+      配置JDK版本为：17、18、19、20。
