@@ -314,10 +314,10 @@ https://newthink.lenovo.com.cn/api/ThinkHome/ProductLine/SearchProductLine?searc
     [Apache HttpComponents](https://hc.apache.org/index.html)
     #### HttpComponents Structure
     ##### HttpComponents Core
-    `HttpCore`[https://hc.apache.org/httpcomponents-core-ga/] is a set of low level HTTP transport components that can be used to build custom client and server side HTTP services with a minimal footprint. HttpCore supports two I/O models: blocking I/O model based on the classic Java I/O and non-blocking, event driven I/O model based on Java NIO.
+    [HttpCore](https://hc.apache.org/httpcomponents-core-ga/) is a set of low level HTTP transport components that can be used to build custom client and server side HTTP services with a minimal footprint. HttpCore supports two I/O models: blocking I/O model based on the classic Java I/O and non-blocking, event driven I/O model based on Java NIO.
     HttpCore 是一组底层 HTTP 传输组件，可用于构建占用资源极少的自定义客户端和服务端 HTTP 服务。HttpCore 支持两种 I/O 模型：基于经典 Java I/O 的阻塞式 I/O 模型和基于 Java NIO 的非阻塞事件驱动型 I/O 模型。
     ##### HttpComponents Client
-    `HttpClient`[https://hc.apache.org/httpcomponents-client-ga/] is a HTTP/1.1 compliant HTTP agent implementation based on HttpCore. It also provides reusable components for client-side authentication, HTTP state management, and HTTP connection management. HttpComponents Client is a successor of and replacement for `Commons HttpClient 3.x`[https://hc.apache.org/httpclient-legacy/index.html]. Users of Commons HttpClient are strongly encouraged to upgrade.
+    [HttpClient](https://hc.apache.org/httpcomponents-client-ga/) is a HTTP/1.1 compliant HTTP agent implementation based on HttpCore. It also provides reusable components for client-side authentication, HTTP state management, and HTTP connection management. HttpComponents Client is a successor of and replacement for [Commons HttpClient 3.x]([https://hc.apache.org/httpclient-legacy/index.html). Users of Commons HttpClient are strongly encouraged to upgrade.
     - 版本管理
       ``` xml
       <dependencyManagement>
