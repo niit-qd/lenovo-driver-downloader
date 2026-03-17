@@ -2,6 +2,8 @@ package org.example.lenovo.driver.downloader.Task;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.my.downloader.archive.archiver.SimpleArchiver;
+import com.my.downloader.archive.archiver.SimpleZipArchiver;
 import com.my.downloader.utils.DownloadUtils;
 import com.my.downloader.utils.MyFileUtils;
 import com.my.downloader.utils.MyUrlUtils;
@@ -92,6 +94,8 @@ public class DriveDownloadTask {
                 logger.warn("haven't implement the DriverSiteType: {}", downloadConfiguration.getDriverSiteType());
             }
         }
+        SimpleArchiver simpleArchiver = new SimpleZipArchiver();
+        simpleArchiver.makeArchive(baseDrivesFolder, baseDrivesFolder.getParentFile(), baseDrivesFolder.getName());
     }
 
     private static LenovoDriverListResult parseLenovoDriveListFromFile(File lenovoDriveListResultFile) {
