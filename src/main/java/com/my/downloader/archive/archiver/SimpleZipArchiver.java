@@ -36,25 +36,32 @@ public class SimpleZipArchiver extends SimpleArchiver {
                 } catch (IOException e) {
                     logger.warn("failed to putArchiveEntry.", e);
                 }
-                boolean result = false;
+                long copied = 0;
                 if (file.isFile()) {
                     try {
-                        FileUtils.copyFile(file, zaos);
+                        copied = FileUtils.copyFile(file, zaos);
                     } catch (IOException e) {
+                        copied = -1;
                         logger.warn("failed to writer file:{} to zip file:{}", file, targetFile);
                     }
                 }
-                logger.debug("add file: {}, result = {}", file, result ? "successful" : "failed");
+                logger.debug("add file: {}, copied = {}", file, copied);
+                try {
+                    zaos.closeArchiveEntry();
+                } catch (IOException e) {
+                    logger.warn("failed to closeArchiveEntry for file: {}", file);
+                }
             });
         } catch (IOException e) {
-            logger.warn("failed to create ZipArchiveOutputStream:{}", targetDir);
+            boolean deleted = targetFile.delete();
+            logger.warn("failed to create zip file :{}, so delete it: {}", targetFile, deleted);
         }
     }
 
     public static void main(String[] args) {
         SimpleArchiver simpleArchiver = new SimpleZipArchiver();
-        String driverSourceDirPath = "D:\\demo\\dir";
-        String driverTargetDirPath = "D:\\demo";
+        String driverSourceDirPath = "D:\\tmp";
+        String driverTargetDirPath = "D:\\";
         String driverTargetFileName = "targetZip";
         simpleArchiver.makeArchive(new File(driverSourceDirPath), new File(driverTargetDirPath), driverTargetFileName);
     }

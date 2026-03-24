@@ -1,6 +1,5 @@
 package com.my.downloader.archive.archiver;
 
-import com.alibaba.fastjson.JSON;
 import lombok.Getter;
 import lombok.NonNull;
 import org.apache.commons.io.FileUtils;
@@ -10,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.*;
-import java.util.function.Consumer;
 
 public abstract class SimpleArchiver {
     private static final Logger logger = LoggerFactory.getLogger(SimpleArchiver.class);
@@ -91,15 +89,15 @@ public abstract class SimpleArchiver {
         if (null == file) {
             return null;
         }
+        String prefixDirPath = file.getParentFile().getAbsolutePath();
         Set<SourceFileInfo> sourceFileInfos = new HashSet<>();
         if (file.isFile()) {
-            sourceFileInfos.add(new SourceFileInfo(file.getParent(), file.getName()));
+            sourceFileInfos.add(new SourceFileInfo(prefixDirPath, file.getName()));
         }
         if (file.isDirectory()) {
             Collection<File> files = FileUtils.listFilesAndDirs(file, FileFilterUtils.fileFileFilter(), FileFilterUtils.directoryFileFilter());
             // FileUtils.listFilesAndDirs会将被查找的目录自身，所以也需要移除。
             files.remove(file);
-            String prefixDirPath = file.getAbsolutePath();
             int prefixDirPathLength = prefixDirPath.length();
             files.forEach(file0 -> {
                 String filePath = file0.getAbsolutePath();
